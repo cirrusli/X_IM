@@ -1,6 +1,7 @@
 package mock
 
 import (
+	x "X_IM"
 	"errors"
 	"time"
 )
@@ -9,7 +10,7 @@ type ServerDemo struct{}
 
 // Start demo入口方法
 func (s *ServerDemo) Start(id, protocol, addr string) {
-	var srv Server
+	var srv x.Server
 	service := &naming.DefaultService{
 		Id:       id,
 		Protocol: protocol,
@@ -39,7 +40,7 @@ type ServerHandler struct {
 }
 
 // Accept this connection
-func (h *ServerHandler) Accept(conn Conn, timeout time.Duration) (string, error) {
+func (h *ServerHandler) Accept(conn x.Conn, timeout time.Duration) (string, error) {
 	// 1. 读取：客户端发送的鉴权数据包
 	frame, err := conn.ReadFrame()
 	if err != nil {
@@ -55,7 +56,7 @@ func (h *ServerHandler) Accept(conn Conn, timeout time.Duration) (string, error)
 }
 
 // Receive default listener
-func (h *ServerHandler) Receive(ag kim.Agent, payload []byte) {
+func (h *ServerHandler) Receive(ag x.Agent, payload []byte) {
 	ack := string(payload) + " from server "
 	_ = ag.Push([]byte(ack))
 }
