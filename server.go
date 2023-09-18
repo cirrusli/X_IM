@@ -36,6 +36,7 @@ type MessageListener interface {
 // Agent 消息发送方
 type Agent interface {
 	ID() string
+	// Push 线程安全的发送数据的方法
 	Push([]byte) error
 }
 
@@ -65,16 +66,7 @@ type Conn interface {
 	WriteFrame(OpCode, []byte) error
 	Flush() error
 }
-type Channel interface {
-	Conn
-	Agent
-	// Close 关闭连接
-	Close() error
-	ReadLoop(lst MessageListener) error
-	// SetWriteWait 设置写超时
-	SetWriteWait(time.Duration)
-	SetReadWait(time.Duration)
-}
+
 type Client interface {
 	ID() string
 	Name() string
