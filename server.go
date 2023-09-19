@@ -6,11 +6,43 @@ import (
 	"time"
 )
 
+const (
+	DefaultReadWait  = time.Minute * 3
+	DefaultWriteWait = time.Second * 10
+	DefaultLoginWait = time.Second * 10
+	DefaultHeartbeat = time.Second * 55
+)
+
+// Service 定义了基础服务的抽象接口
+type Service interface {
+	ServiceID() string
+	ServiceName() string
+	GetMeta() map[string]string
+}
+
+// ServiceRegistration 定义服务注册的抽象接口
+type ServiceRegistration interface {
+	Service
+	PublicAddress() string
+	PublicPort() int
+	DialURL() string
+	GetTags() []string
+	GetProtocol() string
+	GetNamespace() string
+	String() string
+}
+
+// Server 定义了一个tcp/websocket不同协议通用的服务端的接口
 type Server interface {
+	ServiceRegistration
 	SetAcceptor(Acceptor)
+	// SetMessageListener 设置上行消息监听器
 	SetMessageListener(MessageListener)
+	// SetStateListener 设置连接状态监听服务
 	SetStateListener(StateListener)
+	// SetReadWait 设置读超时
 	SetReadWait(time.Duration)
+	// SetChannelMap 设置Channel管理服务
 	SetChannelMap(ChannelMap)
 
 	Start() error
