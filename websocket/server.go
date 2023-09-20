@@ -2,35 +2,25 @@ package websocket
 
 import (
 	x "X_IM"
-	"X_IM/naming"
-	"sync"
-	"time"
+	"bufio"
+	"github.com/gobwas/ws"
+	"net"
 )
 
-type ServerOptions struct {
-	loginWait time.Duration //登录超时
-	readWait  time.Duration //读超时
-	writeWait time.Duration //写超时
-}
-type Server struct {
-	listen string
-	naming.ServiceRegistration
-	x.ChannelMap
-	x.Acceptor
-	x.MessageListener
-	x.StateListener
-	once    sync.Once
-	options ServerOptions
+type Upgrader struct {
 }
 
-func NewServer(listen string, service naming.ServiceRegistration) x.Server {
-	return &Server{
-		listen:              listen,
-		ServiceRegistration: service,
-		options: ServerOptions{
-			loginWait: x.DefaultLoginWait,
-			readWait:  x.DefaultReadWait,
-			writeWait: x.DefaultWriteWait,
-		},
+func NewServer(listen string, service x.ServiceRegistration, options ...x.ServerOption) x.Server {
+	return x.NewServer(listen, service, new(Upgrader), options...)
+}
+func (u *Upgrader) Name() string {
+	return "websocket.Server"
+}
+func (u *Upgrader) Upgrade(rawConn net.Conn, rd *bufio.Reader, wr *bufio.Writer) (x.Conn, error) {
+	_, err := ws.Upgrade(rawConn)
+	if err != nil {
+		return nil, err
 	}
+	conn := NewConnWithRW(rawConn, rd, wr)
+	return conn, nil
 }

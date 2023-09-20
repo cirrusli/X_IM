@@ -3,7 +3,9 @@ package X_IM
 import (
 	"X_IM/logger"
 	"errors"
+	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -14,7 +16,22 @@ type ChannelImpl struct {
 	writeChan chan []byte
 	once      sync.Once
 	writeWait time.Duration
-	closed    *Event
+	readWait  time.Duration
+	state     int32 // 0 init 1 start 2 closed
+}
+
+func (ch *ChannelImpl) SetWriteWait(duration time.Duration) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (ch *ChannelImpl) SetReadWait(duration time.Duration) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (ch *ChannelImpl) ID() string {
+	return ch.id
 }
 
 func NewChannel(id string, conn Conn) Channel {
@@ -26,8 +43,8 @@ func NewChannel(id string, conn Conn) Channel {
 		id:        id,
 		Conn:      conn,
 		writeChan: make(chan []byte, 5),
-		closed:    NewEvent(),
 		writeWait: time.Second * 10,
+		state:     0,
 	}
 	go func() {
 		err := ch.writeLoop()
@@ -41,35 +58,54 @@ func NewChannel(id string, conn Conn) Channel {
 // writeLoop 发送的消息直接通过writeChan发送给了一个独立的goroutine中writeLoop()执行
 // 这样就使得Push变成了一个线程安全方法。
 func (ch *ChannelImpl) writeLoop() error {
-	for {
-		select {
-		case payload := <-ch.writeChan:
+	//for {
+	//	select {
+	//	case payload := <-ch.writeChan:
+	//		err := ch.WriteFrame(OpBinary, payload)
+	//		if err != nil {
+	//			return err
+	//		}
+	//		//批量写
+	//		chanLen := len(ch.writeChan)
+	//		for i := 0; i < chanLen; i++ {
+	//			payload := <-ch.writeChan
+	//			err := ch.WriteFrame(OpBinary, payload)
+	//			if err != nil {
+	//				return err
+	//			}
+	//		}
+	//		err = ch.Conn.Flush()
+	//		if err != nil {
+	//			return err
+	//		}
+	//	case <-ch.closed.Done():
+	//		return nil
+	//	}
+	//}
+	for payload := range ch.writeChan {
+		err := ch.WriteFrame(OpBinary, payload)
+		if err != nil {
+			return err
+		}
+		chanLen := len(ch.writeChan)
+		for i := 0; i < chanLen; i++ {
+			payload = <-ch.writeChan
 			err := ch.WriteFrame(OpBinary, payload)
 			if err != nil {
 				return err
 			}
-			//批量写
-			chanLen := len(ch.writeChan)
-			for i := 0; i < chanLen; i++ {
-				payload := <-ch.writeChan
-				err := ch.WriteFrame(OpBinary, payload)
-				if err != nil {
-					return err
-				}
-			}
-			err = ch.Conn.Flush()
-			if err != nil {
-				return err
-			}
-		case <-ch.closed.Done():
-			return nil
+		}
+		err = ch.Flush()
+		if err != nil {
+			return err
 		}
 	}
+	return nil
 }
 
 func (ch *ChannelImpl) Push(payload []byte) error {
-	if ch.closed.Hasfired() {
-		return errors.New("channel has closed")
+	if atomic.LoadInt32(&ch.state) != 1 {
+		return fmt.Errorf("channel %s has closed", ch.id)
 	}
 	ch.writeChan <- payload
 	return nil
@@ -93,7 +129,7 @@ func (ch *ChannelImpl) ReadLoop(lst MessageListener) error {
 		"id":     ch.id,
 	})
 	for {
-		_ = ch.SetReadDeadline(time.Now().Add(ch.readwait))
+		_ = ch.SetReadDeadline(time.Now().Add(ch.readWait))
 
 		frame, err := ch.ReadFrame()
 		if err != nil {

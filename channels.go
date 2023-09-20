@@ -1,6 +1,9 @@
 package X_IM
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type ChannelMap interface {
 	Add(channel Channel)
@@ -17,4 +20,27 @@ type Channel interface {
 	// SetWriteWait 设置写超时
 	SetWriteWait(time.Duration)
 	SetReadWait(time.Duration)
+}
+type ChannelsImpl struct {
+	channels *sync.Map
+}
+
+func NewChannels(num int) ChannelMap {
+	return &ChannelsImpl{
+		channels: new(sync.Map),
+	}
+}
+func (ch *ChannelsImpl) Add(channel Channel) {
+	//todo
+}
+func (ch *ChannelsImpl) Remove(id string) {
+	//todo
+}
+func (ch *ChannelsImpl) Get(id string) (Channel, bool) {
+	//todo
+	return nil, false
+}
+func (ch *ChannelsImpl) All() []Channel {
+	//todo
+	return nil
 }

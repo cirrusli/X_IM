@@ -2,8 +2,14 @@ package websocket
 
 import (
 	x "X_IM"
+	"bufio"
 	"github.com/gobwas/ws"
 	"net"
+)
+
+const (
+	DefaultReaderSize = 4096
+	DefaultWriterSize = 1024
 )
 
 type Frame struct {
@@ -35,10 +41,28 @@ func (f *Frame) GetPayload() []byte {
 
 type WsConn struct {
 	net.Conn
+	rd *bufio.Reader
+	wr *bufio.Writer
+}
+
+func (c *WsConn) Flush() error {
+	//TODO implement me
+	panic("implement me")
 }
 
 func NewConn(conn net.Conn) *WsConn {
-	return &WsConn{conn}
+	return &WsConn{
+		Conn: conn,
+		rd:   bufio.NewReaderSize(conn, DefaultReaderSize),
+		wr:   bufio.NewWriterSize(conn, DefaultWriterSize),
+	}
+}
+func NewConnWithRW(conn net.Conn, rd *bufio.Reader, wr *bufio.Writer) *WsConn {
+	return &WsConn{
+		Conn: conn,
+		rd:   rd,
+		wr:   wr,
+	}
 }
 func (c *WsConn) ReadFrame() (x.Frame, error) {
 	f, err := ws.ReadFrame(c.Conn)

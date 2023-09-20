@@ -13,6 +13,12 @@ const (
 	DefaultHeartbeat = time.Second * 55
 )
 
+// 定义读取消息的默认goroutine池大小
+const (
+	DefaultMessageReadPool = 5000
+	DefaultConnectionPool  = 5000
+)
+
 // Service 定义了基础服务的抽象接口
 type Service interface {
 	ServiceID() string
@@ -53,7 +59,7 @@ type Server interface {
 // Acceptor Start()监听到连接后，调用此方法让业务层处理握手
 type Acceptor interface {
 	// Accept 返回error则断开连接
-	Accept(Conn, time.Duration) (string, error)
+	Accept(Conn, time.Duration) (string, Meta, error)
 }
 
 // StateListener 报告断开连接的事件
@@ -64,6 +70,8 @@ type StateListener interface {
 type MessageListener interface {
 	Receive(Agent, []byte)
 }
+
+type Meta map[string]string
 
 // Agent 消息发送方
 type Agent interface {
@@ -100,8 +108,7 @@ type Conn interface {
 }
 
 type Client interface {
-	ID() string
-	Name() string
+	Service
 	Connect(string) error
 	// SetDialer 由Connect调用，完成连接的握手和建立
 	SetDialer(Dialer)
