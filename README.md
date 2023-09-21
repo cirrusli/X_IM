@@ -5,8 +5,12 @@ A distributed Instant Messaging system.
 
 ![img.png](assets/img1.png)
 
-## Core Features of Backend System
+### Details
+
 ![img.png](assets/img2.png)
+
+## Core Features of Backend System
+![img.png](assets/img3.png)
 
 The backend system is divided into four parts: Communication Service, Web Service, Advanced Features, and Operations.
 
@@ -69,4 +73,4 @@ Due to being a long-lived distributed cluster, achieving the same level of SLA (
   - Service monitoring, e.g., online users, request duration, garbage collection, memory usage, thread count, forwarded traffic, etc.
 
 ## Core Features of the Web SDK
-![img.png](assets/img3.png)
+![img.png](assets/img4.png)
