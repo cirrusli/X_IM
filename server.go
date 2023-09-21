@@ -19,7 +19,7 @@ const (
 	DefaultConnectionPool  = 5000
 )
 
-// Service 定义了基础服务的抽象接口
+// Service 定义基础服务的抽象接口
 type Service interface {
 	ServiceID() string
 	ServiceName() string
@@ -121,7 +121,7 @@ type Dialer interface {
 	DialAndHandshake(DialerContext) (net.Conn, error)
 }
 type DialerContext struct {
-	Id      string
+	ID      string
 	Name    string
 	Address string
 	Timeout time.Duration

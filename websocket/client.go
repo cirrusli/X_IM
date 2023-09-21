@@ -60,7 +60,7 @@ func (c *Client) Connect(addr string) error {
 	}
 	// 拨号与握手
 	conn, err := c.Dialer.DialAndHandshake(x.DialerContext{
-		Id:      c.id,
+		ID:      c.id,
 		Name:    c.name,
 		Address: addr,
 		Timeout: x.DefaultLoginWait,

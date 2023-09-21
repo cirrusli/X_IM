@@ -21,7 +21,7 @@ func (d *WebsocketDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error
 		return nil, err
 	}
 	// 2. 发送用户认证信息，示例就是userid
-	err = wsutil.WriteClientBinary(conn, []byte(ctx.Id))
+	err = wsutil.WriteClientBinary(conn, []byte(ctx.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (d *TCPDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 		return nil, err
 	}
 	// 2. 发送用户认证信息，示例就是userid
-	err = tcp.WriteFrame(conn, x.OpBinary, []byte(ctx.Id))
+	err = tcp.WriteFrame(conn, x.OpBinary, []byte(ctx.ID))
 	if err != nil {
 		return nil, err
 	}
