@@ -5,6 +5,12 @@ import (
 	"sync/atomic"
 )
 
+//Event仅是做简单封闭，方便调用
+//Event与ctx, cancel := context.WithCancel(context.Background())的作用相同
+//Fire方法等价cancel()
+//Done方法等价<-ctx.Done()
+//HasFired方法等价select{case <-ctx.Done(): return true; default: return false}
+
 // Event represents a one-time event that may occur in the future.
 type Event struct {
 	fired int32
@@ -12,8 +18,8 @@ type Event struct {
 	o     sync.Once
 }
 
-// Fire causes e to complete.  It is safe to call multiple times, and
-// concurrently.  It returns true iff this call to Fire caused the signaling
+// Fire causes e to complete.  It is safe to call multiple times, and concurrently.
+// It returns true if this call to Fire caused the signaling
 // channel returned by Done to close.
 func (e *Event) Fire() bool {
 	ret := false
