@@ -1,76 +1,63 @@
 # X_IM
-A distributed Instant Messaging system.
 
-## System Layers
+一个分布式即时通讯系统的框架。
 
-![img.png](assets/img1.png)
+![技术选型](./assets/technicalSelect.png)
 
-### Details
+### 项目目录结构
 
-![img.png](assets/img2.png)
+#### assets
 
-## Core Features of Backend System
-![img.png](assets/img3.png)
+md依赖的图片文件等
 
-The backend system is divided into four parts: Communication Service, Web Service, Advanced Features, and Operations.
+#### container
 
-### I. Communication Service
-The Communication Service is the core component, primarily providing the following functions:
+容器层，服务托管
 
-- Support for access via TCP/WebSocket protocols.
+#### examples
 
-- Implementation of functions such as login, logout, and mutual account kicking.
+各种mock、benchmark测试示例
 
-- One-on-one chat: Direct messaging between two users.
+#### gateway
 
-- Group chat: Messaging among multiple users.
+网关层，负载均衡，管理长连接
 
-- Offline messaging.
+#### logger
 
-- Sensitive word filtering principles and processes.
+系统的日志模块，使用logrus库
 
-- Group management:
-  - Create groups.
-  - Group details.
-  - Join groups.
-  - Leave groups.
-  - Member lists.
+#### naming
 
-### II. Web Service
+容器层，服务注册与发现
 
-Main functionalities include:
+抽象通用的注册中心接口，可以更便捷地接入其他注册中心
 
-- Authorization service.
-- User management:
-  - Create users.
-  - Query details.
+使用consul，DNS做服务发现
 
-**Not covered**: Management of friend relationships and message send/receive permissions.
+#### tcp
 
-### III. Advanced Features
+通信层，处理tcp的数据
 
-Due to being a long-lived distributed cluster, achieving the same level of SLA (Service Level Agreement) as HTTP services is more challenging. Advanced features include:
+#### websocket
 
-- Testing:
-  - Unit testing: Ensuring logic reliability through coverage tests.
-  - Benchmark testing: Testing the performance of login, one-on-one chat, and group chat.
-- Performance optimization: System optimization in terms of memory, garbage collection, buffering, etc.
-- Intelligent routing: Introduction to routing and load balancing logic for long-lived front-end services.
-- Multi-tenancy: Explaining the principles of multi-tenancy implementation and service isolation.
-- Gray release: Introducing the principles and practices of gray release systems.
-- Deployment architecture: Discussing distributed deployment architectures and key considerations.
+通信层，处理websocket的数据
 
-### IV. Operations
+#### wire
 
-- Logging system
-  (Filebeat, Kafka, ES, Kibana)
-  - Program logs.
-  - Business logs, such as login and logout events.
+协议层，字节序、proto文件、自定义序列化等
 
-- Monitoring and alerting system
-  (Prometheus, Grafana)
-  - Machine monitoring, e.g., CPU, memory, disk usage, etc.
-  - Service monitoring, e.g., online users, request duration, garbage collection, memory usage, thread count, forwarded traffic, etc.
+##### channel.go
 
-## Core Features of the Web SDK
-![img.png](assets/img4.png)
+通信层，channel实现
+
+##### channels.go
+
+通信层
+
+##### client.go
+
+##### default_server.go
+
+##### server.go
+
+定义了通信层的接口，如channel
