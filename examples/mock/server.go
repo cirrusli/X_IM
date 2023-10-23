@@ -2,20 +2,22 @@ package mock
 
 import (
 	x "X_IM"
+	"X_IM/logger"
+	"X_IM/naming"
+	"X_IM/tcp"
+	"X_IM/websocket"
 	"errors"
 	"time"
 )
 
 type ServerDemo struct{}
 
-// Start demo入口方法
 func (s *ServerDemo) Start(id, protocol, addr string) {
 	var srv x.Server
 	service := &naming.DefaultService{
 		Id:       id,
 		Protocol: protocol,
 	}
-	// 忽略NewServer的内部逻辑，你可以认为它是一个空的方法，或者一个mock对象。
 	if protocol == "ws" {
 		srv = websocket.NewServer(addr, service)
 	} else if protocol == "tcp" {
@@ -46,6 +48,7 @@ func (h *ServerHandler) Accept(conn x.Conn, timeout time.Duration) (string, erro
 	if err != nil {
 		return "", err
 	}
+	logger.Info("recv", frame.GetOpCode())
 	// 2. 解析：数据包内容就是userId
 	userID := string(frame.GetPayload())
 	// 3. 鉴权：这里只是为了示例做一个fake验证，非空
