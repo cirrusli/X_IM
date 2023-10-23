@@ -141,8 +141,15 @@ func (c *Client) Read() (x.Frame, error) {
 }
 
 func (c *Client) Close() {
-	//TODO implement me
-	panic("implement me")
+	c.once.Do(func() {
+		if c.conn == nil {
+			return
+		}
+		_ = wsutil.WriteClientMessage(c.conn, ws.OpClose, nil)
+
+		_ = c.conn.Close()
+		atomic.CompareAndSwapInt32(&c.state, 1, 0)
+	})
 }
 
 func (c *Client) SetDialer(dialer x.Dialer) {

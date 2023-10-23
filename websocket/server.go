@@ -5,6 +5,7 @@ import (
 	"X_IM/logger"
 	"X_IM/naming"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gobwas/ws"
 	"github.com/segmentio/ksuid"
@@ -123,36 +124,53 @@ func respError(w http.ResponseWriter, code int, body string) {
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	//TODO implement me
-	panic("implement me")
+	log := logger.WithFields(logger.Fields{
+		"module": "ws.server",
+		"id":     s.ServiceID(),
+	})
+	s.once.Do(func() {
+		defer func() {
+			log.Infoln("shutdown")
+		}()
+		channels := s.ChannelMap.All()
+		for _, ch := range channels {
+			_ = ch.Close()
+
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				continue
+			}
+		}
+	})
+	return nil
 }
 
 func (s *Server) SetAcceptor(acceptor x.Acceptor) {
-	//TODO implement me
-	panic("implement me")
+	s.Acceptor = acceptor
 }
 
 func (s *Server) SetMessageListener(listener x.MessageListener) {
-	//TODO implement me
-	panic("implement me")
+	s.MessageListener = listener
 }
 
 func (s *Server) SetStateListener(listener x.StateListener) {
-	//TODO implement me
-	panic("implement me")
+	s.StateListener = listener
 }
 
-func (s *Server) SetReadWait(duration time.Duration) {
-	//TODO implement me
-	panic("implement me")
+func (s *Server) SetReadWait(readWait time.Duration) {
+	s.options.readWait = readWait
 }
 
-func (s *Server) SetChannelMap(channelMap x.ChannelMap) {
-	//TODO implement me
-	panic("implement me")
+func (s *Server) SetChannelMap(channels x.ChannelMap) {
+	s.ChannelMap = channels
 }
 
-func (s *Server) Push(s2 string, bytes []byte) error {
-	//TODO implement me
-	panic("implement me")
+func (s *Server) Push(id string, data []byte) error {
+	ch, ok := s.ChannelMap.Get(id)
+	if !ok {
+		return errors.New("channel not found")
+	}
+	return ch.Push(data)
 }

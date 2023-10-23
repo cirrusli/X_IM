@@ -41,14 +41,18 @@ func NewChannel(id string, conn Conn) Channel {
 	}()
 	return ch
 }
-func (ch *ChannelImpl) SetWriteWait(duration time.Duration) {
-	//TODO implement me
-	panic("implement me")
+func (ch *ChannelImpl) SetWriteWait(writeWait time.Duration) {
+	if writeWait == 0 {
+		return
+	}
+	ch.writeWait = writeWait
 }
 
-func (ch *ChannelImpl) SetReadWait(duration time.Duration) {
-	//TODO implement me
-	panic("implement me")
+func (ch *ChannelImpl) SetReadWait(readWait time.Duration) {
+	if readWait == 0 {
+		return
+	}
+	ch.readWait = readWait
 }
 
 func (ch *ChannelImpl) ID() string {
