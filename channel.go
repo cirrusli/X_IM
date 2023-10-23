@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// ChannelImpl is a websocket implement of channel
 type ChannelImpl struct {
 	sync.Mutex
 	id string
@@ -18,20 +19,6 @@ type ChannelImpl struct {
 	writeWait time.Duration
 	readWait  time.Duration
 	state     int32 // 0 init 1 start 2 closed
-}
-
-func (ch *ChannelImpl) SetWriteWait(duration time.Duration) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (ch *ChannelImpl) SetReadWait(duration time.Duration) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (ch *ChannelImpl) ID() string {
-	return ch.id
 }
 
 func NewChannel(id string, conn Conn) Channel {
@@ -53,6 +40,19 @@ func NewChannel(id string, conn Conn) Channel {
 		}
 	}()
 	return ch
+}
+func (ch *ChannelImpl) SetWriteWait(duration time.Duration) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (ch *ChannelImpl) SetReadWait(duration time.Duration) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (ch *ChannelImpl) ID() string {
+	return ch.id
 }
 
 // writeLoop 发送的消息直接通过writeChan发送给了一个独立的goroutine中writeLoop()执行
@@ -104,6 +104,7 @@ func (ch *ChannelImpl) writeLoop() error {
 }
 
 func (ch *ChannelImpl) Push(payload []byte) error {
+	// 通过原子操作保证了Channel的线程安全
 	if atomic.LoadInt32(&ch.state) != 1 {
 		return fmt.Errorf("channel %s has closed", ch.id)
 	}
@@ -148,7 +149,7 @@ func (ch *ChannelImpl) ReadLoop(lst MessageListener) error {
 			continue
 		}
 		//Channel的生命周期是被通信层中的Server管理的
-		//因此不希望Channel被上层消息处理器直接操作，比如误调用Close()导致连接关闭。
+		//不希望其被上层消息处理器MessageListener直接操作，比如误调用Close()导致连接关闭。
 		go lst.Receive(ch, payload)
 	}
 }
