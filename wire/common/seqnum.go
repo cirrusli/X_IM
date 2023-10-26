@@ -22,5 +22,5 @@ func (s *sequence) Next() uint32 {
 	return next
 }
 
-// Seq 提供给外部一个全局可用的序列号生成器
+// Seq 单例模式，提供给外部一个全局可用的序列号生成器
 var Seq = sequence{num: 1}

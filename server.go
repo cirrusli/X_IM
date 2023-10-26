@@ -84,8 +84,7 @@ type Conn interface {
 
 // Client 定义了一个tcp/websocket不同协议通用的客户端的接口
 type Client interface {
-	ID() string
-	Name() string
+	Service
 	Connect(string) error
 	// SetDialer 由Connect调用，完成连接的握手和建立
 	SetDialer(Dialer)

@@ -26,19 +26,27 @@ type Client struct {
 	conn    x.Conn
 	state   int32
 	options ClientOptions
+	Meta    map[string]string
 }
 
 func NewClient(id, name string, opts ClientOptions) x.Client {
+	return NewClientWithProps(id, name, make(map[string]string), opts)
+}
+
+// NewClientWithProps with properties
+func NewClientWithProps(id, name string, meta map[string]string, opts ClientOptions) x.Client {
 	if opts.WriteWait == 0 {
 		opts.WriteWait = x.DefaultWriteWait
 	}
 	if opts.ReadWait == 0 {
 		opts.ReadWait = x.DefaultReadWait
 	}
+
 	cli := &Client{
 		id:      id,
 		name:    name,
 		options: opts,
+		Meta:    meta,
 	}
 	return cli
 }
@@ -146,10 +154,11 @@ func (c *Client) SetDialer(dialer x.Dialer) {
 	c.Dialer = dialer
 }
 
-func (c *Client) ID() string {
+func (c *Client) ServiceID() string {
 	return c.id
 }
 
-func (c *Client) Name() string {
+func (c *Client) ServiceName() string {
 	return c.name
 }
+func (c *Client) GetMeta() map[string]string { return c.Meta }

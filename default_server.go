@@ -64,8 +64,8 @@ func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, op
 type defaultAcceptor struct {
 }
 
-func (a *defaultAcceptor) Accept(conn Conn, timeout time.Duration) (string, Meta, error) {
-	return ksuid.New().String(), Meta{}, nil
+func (a *defaultAcceptor) Accept(conn Conn, timeout time.Duration) (string, error) {
+	return ksuid.New().String(), nil
 }
 func (s *DefaultServer) Start() error {
 	log := logger.WithFields(logger.Fields{

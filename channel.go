@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -18,7 +17,7 @@ type ChannelImpl struct {
 	once      sync.Once
 	writeWait time.Duration
 	readWait  time.Duration
-	state     int32 // 0 init 1 start 2 closed
+	closed    *Event
 }
 
 func NewChannel(id string, conn Conn) Channel {
@@ -30,8 +29,9 @@ func NewChannel(id string, conn Conn) Channel {
 		id:        id,
 		Conn:      conn,
 		writeChan: make(chan []byte, 5),
-		writeWait: time.Second * 10,
-		state:     0,
+		writeWait: DefaultWriteWait,
+		readWait:  DefaultReadWait,
+		closed:    NewEvent(),
 	}
 	go func() {
 		err := ch.writeLoop()
@@ -62,56 +62,38 @@ func (ch *ChannelImpl) ID() string {
 // writeLoop 发送的消息直接通过writeChan发送给了一个独立的goroutine中writeLoop()执行
 // 这样就使得Push变成了一个线程安全方法。
 func (ch *ChannelImpl) writeLoop() error {
-	//for {
-	//	select {
-	//	case payload := <-ch.writeChan:
-	//		err := ch.WriteFrame(OpBinary, payload)
-	//		if err != nil {
-	//			return err
-	//		}
-	//		//批量写
-	//		chanLen := len(ch.writeChan)
-	//		for i := 0; i < chanLen; i++ {
-	//			payload := <-ch.writeChan
-	//			err := ch.WriteFrame(OpBinary, payload)
-	//			if err != nil {
-	//				return err
-	//			}
-	//		}
-	//		err = ch.Conn.Flush()
-	//		if err != nil {
-	//			return err
-	//		}
-	//	case <-ch.closed.Done():
-	//		return nil
-	//	}
-	//}
-	for payload := range ch.writeChan {
-		err := ch.WriteFrame(OpBinary, payload)
-		if err != nil {
-			return err
-		}
-		chanLen := len(ch.writeChan)
-		for i := 0; i < chanLen; i++ {
-			payload = <-ch.writeChan
+	for {
+		select {
+		case payload := <-ch.writeChan:
 			err := ch.WriteFrame(OpBinary, payload)
 			if err != nil {
 				return err
 			}
-		}
-		err = ch.Flush()
-		if err != nil {
-			return err
+			//批量写
+			chanLen := len(ch.writeChan)
+			for i := 0; i < chanLen; i++ {
+				payload := <-ch.writeChan
+				err := ch.WriteFrame(OpBinary, payload)
+				if err != nil {
+					return err
+				}
+			}
+			err = ch.Conn.Flush()
+			if err != nil {
+				return err
+			}
+		case <-ch.closed.Done():
+			return nil
 		}
 	}
-	return nil
 }
 
 func (ch *ChannelImpl) Push(payload []byte) error {
 	// 通过原子操作保证了Channel的线程安全
-	if atomic.LoadInt32(&ch.state) != 1 {
+	if ch.closed.HasFired() {
 		return fmt.Errorf("channel %s has closed", ch.id)
 	}
+	// 异步写
 	ch.writeChan <- payload
 	return nil
 }
