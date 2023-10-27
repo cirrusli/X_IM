@@ -17,7 +17,7 @@ type ServiceRegistration interface {
 
 // DefaultService Service Impl
 type DefaultService struct {
-	Id        string
+	ID        string
 	Name      string
 	Address   string
 	Port      int
@@ -29,7 +29,7 @@ type DefaultService struct {
 
 func NewEntry(id, name, protocol string, address string, port int) ServiceRegistration {
 	return &DefaultService{
-		Id:       id,
+		ID:       id,
 		Name:     name,
 		Address:  address,
 		Port:     port,
@@ -39,7 +39,7 @@ func NewEntry(id, name, protocol string, address string, port int) ServiceRegist
 
 // ServiceID returns the ServiceImpl ID
 func (e *DefaultService) ServiceID() string {
-	return e.Id
+	return e.ID
 }
 
 func (e *DefaultService) GetNamespace() string { return e.Namespace }
@@ -64,5 +64,6 @@ func (e *DefaultService) GetTags() []string { return e.Tags }
 func (e *DefaultService) GetMeta() map[string]string { return e.Meta }
 
 func (e *DefaultService) String() string {
-	return fmt.Sprintf("Id:%s,Name:%s,Address:%s,Port:%d,Ns:%s,Tags:%v,Meta:%v", e.Id, e.Name, e.Address, e.Port, e.Namespace, e.Tags, e.Meta)
+	return fmt.Sprintf("ID:%s,Name:%s,Address:%s,Port:%d,Ns:%s,Tags:%v,Meta:%v",
+		e.ID, e.Name, e.Address, e.Port, e.Namespace, e.Tags, e.Meta)
 }
