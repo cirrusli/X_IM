@@ -11,7 +11,7 @@ message User {
 }
 
 message Message {
-    int64 id = 1;
+    int64 ID = 1;
     int32 type = 2;
     string body = 3;
     string extra = 4;
@@ -34,12 +34,12 @@ message InsertMessageReq {
 }
 
 message InsertMessageResp {
-    int64 message_id = 1;
+    int64 messageID = 1;
 }
 
 message AckMessageReq {
     string account = 1;
-    int64 message_id = 2;
+    int64 messageID = 2;
 }
 
 message CreateGroupReq {
@@ -52,25 +52,25 @@ message CreateGroupReq {
 }
 
 message CreateGroupResp {
-    string group_id = 1;
+    string groupID = 1;
 }
 
 message JoinGroupReq {
     string account = 1;
-    string group_id = 2;
+    string groupID = 2;
 }
 
 message QuitGroupReq {
     string account = 1;
-    string group_id = 2;
+    string groupID = 2;
 }
 
 message GetGroupReq {
-    string group_id = 1;
+    string groupID = 1;
 }
 
 message GetGroupResp {
-    string id = 1;
+    string ID = 1;
     string name = 2;
     string avatar = 3;
     string introduction = 4;
@@ -79,7 +79,7 @@ message GetGroupResp {
 }
 
 message GroupMembersReq {
-    string group_id = 1;
+    string groupID = 1;
 }
 
 message GroupMembersResp {
@@ -88,7 +88,7 @@ message GroupMembersResp {
 
 message GetOfflineMessageIndexReq {
     string account = 1;
-    int64 message_id = 2;
+    int64 messageID = 2;
 }
 
 message GetOfflineMessageIndexResp {
@@ -96,7 +96,7 @@ message GetOfflineMessageIndexResp {
 }
 
 message MessageIndex {
-    int64 message_id = 1;
+    int64 messageID = 1;
     int32 direction = 2;
     int64 send_time  = 3;
 	  string accountB = 4;
@@ -104,7 +104,7 @@ message MessageIndex {
 }
 
 message GetOfflineMessageContentReq {
-    repeated int64 message_ids = 1;
+    repeated int64 messageIDs = 1;
 }
 
 message GetOfflineMessageContentResp {

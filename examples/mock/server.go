@@ -15,7 +15,7 @@ type ServerDemo struct{}
 func (s *ServerDemo) Start(id, protocol, addr string) {
 	var srv x.Server
 	service := &naming.DefaultService{
-		Id:       id,
+		ID:       id,
 		Protocol: protocol,
 	}
 	if protocol == "ws" {

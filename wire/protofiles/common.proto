@@ -2,6 +2,7 @@ syntax = "proto3";
 package pkt;
 //这里之前是./pkt，就会生成到protofiles目录下，会新建一个pkt文件夹。。
 option go_package = "../pkt";
+//生成命令：protoc --go_out=. common.proto
 
 // status is a uint16 value
 enum Status {
@@ -11,7 +12,7 @@ enum Status {
     NoDestination = 100;
     InvalidPacketBody = 101;
     InvalidCommand = 103;
-    Unauthorized = 105 ;
+    Unauthenticated = 105 ;
     // server error > 300
     SystemException = 500;
     NotImplemented = 501;

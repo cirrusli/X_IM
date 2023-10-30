@@ -154,7 +154,7 @@ func pushMessage(packet *pkt.LogicPkt) error {
 	return nil
 }
 
-// Forward message to service
+// Forward message to service of Client
 func Forward(serviceName string, packet *pkt.LogicPkt) error {
 	if packet == nil {
 		return errors.New("packet is nil")

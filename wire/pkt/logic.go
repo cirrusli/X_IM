@@ -16,6 +16,9 @@ type LogicPkt struct {
 	Header
 	Body []byte `json:"body,omitempty"`
 }
+
+// HeaderOption 为了创建对象时参数可选，通过闭包实现选项模式
+// Withxxx是默认的函数名称格式
 type HeaderOption func(*Header)
 
 func WithStatus(status Status) HeaderOption {
@@ -123,6 +126,7 @@ func (p *LogicPkt) String() string {
 	return fmt.Sprintf("header:%v body:%dbits", &p.Header, len(p.Body))
 }
 
+// ServiceName 从消息头的command中获取服务名
 func (h *Header) ServiceName() string {
 	arr := strings.SplitN(h.Command, ".", 2)
 	if len(arr) <= 1 {

@@ -67,26 +67,26 @@ message GroupCreateReq {
 }
 
 message GroupCreateResp {
-    string group_id = 1;
+    string groupID = 1;
 }
 
 message GroupCreateNotify {
-    string group_id = 1;
+    string groupID = 1;
     repeated string members = 2;
 }
 
 message GroupJoinReq {
     string account = 1;
-    string group_id = 2;
+    string groupID = 2;
 }
 
 message GroupQuitReq {
     string account = 1;
-    string group_id = 2;
+    string groupID = 2;
 }
 
 message GroupGetReq {
-    string group_id = 1;
+    string groupID = 1;
 }
 
 message Member {
@@ -107,17 +107,17 @@ message GroupGetResp {
 }
 
 message GroupJoinNotify {
-    string group_id = 1;
+    string groupID = 1;
     string account = 2;
 }
 
 message GroupQuitNotify {
-    string group_id = 1;
+    string groupID = 1;
     string account = 2;
 }
 
 message MessageIndexReq {
-    int64 message_id = 1;
+    int64 messageID = 1;
 }
 
 message MessageIndexResp {
@@ -125,7 +125,7 @@ message MessageIndexResp {
 }
 
 message MessageIndex {
-    int64 message_id = 1;
+    int64 messageID = 1;
     int32 direction = 2;
     int64 send_time  = 3;
     string accountB = 4;
@@ -133,7 +133,7 @@ message MessageIndex {
 }
 
 message MessageContentReq {
-    repeated int64 message_ids = 1;
+    repeated int64 messageIDs = 1;
 }
 
 message MessageContent {

@@ -1,0 +1,8 @@
+ServiceID: gate01
+ServiceName: "wgateway"
+Listen: ":8000"
+PublicAddress: "localhost"
+PublicPort: 8000
+Tags:
+  - gateway
+ConsulURL: localhost:8500

@@ -9,6 +9,7 @@ import (
 // Selector is used to select a Service
 // 选择器的作用是将请求或流量分发给适当的容器或实例，以实现负载均衡、故障转移等
 // 除了hash selector，还有最少连接数、随机、轮询（顺序分发）、加权等selectors
+// 如果需要添加其他selector，再考虑接口文件解耦
 type Selector interface {
 	Lookup(*pkt.Header, []x.Service) string
 }
