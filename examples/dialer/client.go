@@ -20,6 +20,7 @@ type ClientDialer struct {
 }
 
 func (d *ClientDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
+	logger.Infoln("in dialer/client.go:DialAndHandshake():arrived here.")
 	// 1. 拨号
 	conn, _, _, err := ws.Dial(context.TODO(), ctx.Address)
 	if err != nil {
@@ -48,6 +49,7 @@ func (d *ClientDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 
 	// wait resp
 	_ = conn.SetReadDeadline(time.Now().Add(ctx.Timeout))
+	logger.Infoln("in dialer/client.go:DialAndHandshake():doing login_test.go:will read frame.")
 	frame, err := ws.ReadFrame(conn)
 	if err != nil {
 		return nil, err

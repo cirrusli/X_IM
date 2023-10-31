@@ -18,6 +18,8 @@ type ClientDemo struct {
 }
 
 func (c *ClientDemo) Start(userID, protocol, addr string) {
+	logger.Infoln("in mock/client.go:Start():arrived here.")
+
 	var cli x.Client
 
 	// step1: 初始化客户端
@@ -35,9 +37,10 @@ func (c *ClientDemo) Start(userID, protocol, addr string) {
 	if err != nil {
 		logger.Error(err)
 	}
-	count := 5
+	count := 2
+	logger.Infoln("in mock/client.go:Start():sending message twice.")
 	go func() {
-		// step3: 发送消息然后退出
+		// step3: 发送count次消息然后退出
 		for i := 0; i < count; i++ {
 			err := cli.Send([]byte("hello"))
 			if err != nil {
@@ -60,21 +63,20 @@ func (c *ClientDemo) Start(userID, protocol, addr string) {
 			continue
 		}
 		recv++
-		logger.Warnf("%s receive message [%s]", cli.ServiceID(), frame.GetPayload())
+		logger.Infof("cli.ServiceID:%s receive message [%s]", cli.ServiceID(), frame.GetPayload())
 		if recv == count { // 接收完消息
 			break
 		}
 	}
-	//退出
 	cli.Close()
 }
 
-// WebsocketDialer WebsocketDialer
 type WebsocketDialer struct {
 }
 
-// DialAndHandshake DialAndHandshake
 func (d *WebsocketDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
+	logger.Infoln("in mock/client.go:DialAndHandshake():websocket dialer")
+
 	// 1 调用ws.Dial拨号
 	conn, _, _, err := ws.Dial(context.TODO(), ctx.Address)
 	if err != nil {
@@ -89,13 +91,11 @@ func (d *WebsocketDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error
 	return conn, nil
 }
 
-// TCPDialer TCPDialer
 type TCPDialer struct {
 }
 
-// DialAndHandshake DialAndHandshake
 func (d *TCPDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
-	logger.Info("start dial: ", ctx.Address)
+	logger.Infoln("in examples/mock/client.go:DialAndHandshake(): TCPDialer dialing: ", ctx.Address)
 	// 1 调用net.Dial拨号
 	conn, err := net.DialTimeout("tcp", ctx.Address, ctx.Timeout)
 	if err != nil {

@@ -7,12 +7,19 @@ import (
 	"X_IM/tcp"
 	"X_IM/websocket"
 	"errors"
+	"net/http"
 	"time"
 )
 
 type ServerDemo struct{}
 
+type ServerHandler struct {
+}
+
 func (s *ServerDemo) Start(id, protocol, addr string) {
+	go func() {
+		_ = http.ListenAndServe("0.0.0.0:6060", nil)
+	}()
 	var srv x.Server
 	service := &naming.DefaultService{
 		ID:       id,
@@ -37,35 +44,32 @@ func (s *ServerDemo) Start(id, protocol, addr string) {
 	}
 }
 
-// ServerHandler ServerHandler
-type ServerHandler struct {
-}
-
 // Accept this connection
-func (h *ServerHandler) Accept(conn x.Conn, timeout time.Duration) (string, error) {
+func (h *ServerHandler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, error) {
 	// 1. 读取：客户端发送的鉴权数据包
 	frame, err := conn.ReadFrame()
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
-	logger.Info("recv", frame.GetOpCode())
+	logger.Info("in examples/mock/server.go:Accept(): received an opcode:", frame.GetOpCode())
 	// 2. 解析：数据包内容就是userId
 	userID := string(frame.GetPayload())
 	// 3. 鉴权：这里只是为了示例做一个fake验证，非空
 	if userID == "" {
-		return "", errors.New("user id is invalid")
+		return "", nil, errors.New("user id is invalid")
 	}
-	return userID, nil
+	logger.Infof("in examples/mock/server.go:Accept(): logined %s", userID)
+	return userID, nil, nil
 }
 
 // Receive default listener
 func (h *ServerHandler) Receive(ag x.Agent, payload []byte) {
-	ack := string(payload) + " from server "
-	_ = ag.Push([]byte(ack))
+	logger.Infof("srv received %s", string(payload))
+	_ = ag.Push([]byte("ok"))
 }
 
 // Disconnect default listener
 func (h *ServerHandler) Disconnect(id string) error {
-	logger.Warnf("disconnect %s", id)
+	logger.Warnf("in examples/mock/server.go:Disconnect(): disconnecter id: %s", id)
 	return nil
 }

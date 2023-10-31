@@ -14,9 +14,9 @@ func main() {
 	flag.Parse()
 
 	root := &cobra.Command{
-		Use:     "test",
+		Use:     "",
 		Version: version,
-		Short:   "server",
+		Short:   "there is mock test",
 	}
 	ctx := context.Background()
 

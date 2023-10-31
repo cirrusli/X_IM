@@ -10,6 +10,7 @@ func Login(wsurl, account string, appSecrets ...string) (x.Client, error) {
 	cli := websocket.NewClient(account, "unit_test", websocket.ClientOptions{})
 	secret := token.DefaultSecret
 	if len(appSecrets) > 0 {
+		//使用传入的第一个appSecret
 		secret = appSecrets[0]
 	}
 	cli.SetDialer(&ClientDialer{
