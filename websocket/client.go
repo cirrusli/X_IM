@@ -52,11 +52,14 @@ func NewClientWithProps(id, name string, meta map[string]string, opts ClientOpti
 		options: opts,
 		Meta:    meta,
 	}
+	logger.Infoln("in websocket/client.go:NewClientWithProps():succeed.")
 	return cli
 }
 
 // Connect to server
 func (c *Client) Connect(addr string) error {
+	logger.Infoln("in websocket/client.go:Connect():arrived here.")
+
 	_, err := url.Parse(addr)
 	if err != nil {
 		return err
@@ -115,8 +118,9 @@ func (c *Client) ping(conn net.Conn) error {
 }
 
 func (c *Client) Send(payload []byte) error {
-	if atomic.LoadInt32(&c.state) != 0 {
-		return fmt.Errorf("client has not connected(nil!)")
+
+	if atomic.LoadInt32(&c.state) == 0 {
+		return fmt.Errorf("client has not connected")
 	}
 	c.Lock()
 	defer c.Unlock()

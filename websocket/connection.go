@@ -2,6 +2,7 @@ package websocket
 
 import (
 	x "X_IM"
+	"X_IM/logger"
 	"bufio"
 	"github.com/gobwas/ws"
 	"net"
@@ -41,6 +42,8 @@ func NewConnWithRW(conn net.Conn, rd *bufio.Reader, wr *bufio.Writer) *WsConn {
 }
 
 func (c *WsConn) ReadFrame() (x.Frame, error) {
+	logger.Infoln("in websocket/connection.go:ReadFrame():arrived here.")
+
 	f, err := ws.ReadFrame(c.Conn)
 	if err != nil {
 		return nil, err
@@ -49,6 +52,7 @@ func (c *WsConn) ReadFrame() (x.Frame, error) {
 }
 
 func (c *WsConn) WriteFrame(op x.OpCode, payload []byte) error {
+	logger.Infoln("in websocket/connection.go:WriteFrame():arrived here.")
 	//在websocket协议中第一个bit位就是fin，表示当前帧是否为连续帧中的最后一帧
 	//由于我们的数据包大小不会超过一个websocket协议单个帧最大值
 	//因此这里fin直接为true，也就是不会把包拆分成多个。

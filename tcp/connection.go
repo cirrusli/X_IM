@@ -3,6 +3,7 @@ package tcp
 import (
 	x "X_IM"
 	"X_IM/wire/endian"
+	"bufio"
 	"io"
 	"net"
 )
@@ -10,6 +11,8 @@ import (
 // WrappedConn is the tcp connection
 type WrappedConn struct {
 	net.Conn
+	rd *bufio.Reader
+	wr *bufio.Writer
 }
 type Frame struct {
 	OpCode  x.OpCode
@@ -17,8 +20,20 @@ type Frame struct {
 }
 
 // NewConn 用来包装TCP的底层连接
-func NewConn(c net.Conn) *WrappedConn {
-	return &WrappedConn{Conn: c}
+func NewConn(conn net.Conn) x.Conn {
+	return &WrappedConn{
+		Conn: conn,
+		rd:   bufio.NewReaderSize(conn, 4096),
+		wr:   bufio.NewWriterSize(conn, 1024),
+	}
+}
+
+func NewConnWithRW(conn net.Conn, rd *bufio.Reader, wr *bufio.Writer) *WrappedConn {
+	return &WrappedConn{
+		Conn: conn,
+		rd:   rd,
+		wr:   wr,
+	}
 }
 
 func (c *WrappedConn) ReadFrame() (x.Frame, error) {
@@ -38,6 +53,9 @@ func (c *WrappedConn) ReadFrame() (x.Frame, error) {
 
 func (c *WrappedConn) WriteFrame(code x.OpCode, payload []byte) error {
 	return WriteFrame(c.Conn, code, payload)
+}
+func (c *WrappedConn) Flush() error {
+	return c.wr.Flush()
 }
 
 func WriteFrame(w io.Writer, code x.OpCode, payload []byte) error {
@@ -64,8 +82,4 @@ func (f Frame) SetPayload(payload []byte) {
 
 func (f Frame) GetPayload() []byte {
 	return f.Payload
-}
-
-func (c *WrappedConn) Flush() error {
-	return nil
 }

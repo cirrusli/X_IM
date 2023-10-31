@@ -71,6 +71,7 @@ func (c *ContextImpl) Next() {
 		return
 	}
 	f(c)
+	//todo is that necessary?
 	c.Next()
 }
 

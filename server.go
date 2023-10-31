@@ -43,9 +43,15 @@ type Server interface {
 	// SetChannelMap 设置Channel管理服务
 	SetChannelMap(ChannelMap)
 
+	// Start 用于在内部实现网络端口的监听和接收连接，
+	// 并完成一个Channel的初始化过程。
 	Start() error
+	// Push 消息到指定的Channel中
+	//  string channelID
+	//  []byte 序列化之后的消息数据
 	Push(string, []byte) error
-	Shutdown(ctx context.Context) error
+	// Shutdown 服务下线，关闭连接
+	Shutdown(context.Context) error
 }
 
 type Channel interface {
@@ -64,6 +70,7 @@ type Agent interface {
 	ID() string
 	// Push 线程安全的发送数据的方法，channel实现了消息的异步批量发送
 	Push([]byte) error
+	GetMeta() Meta
 }
 
 // Frame 解决tcp流式传输导致的封包与拆包，将tcp/websocket的数据接口统一
@@ -96,12 +103,14 @@ type Client interface {
 
 // Acceptor Start()监听到连接后，调用此方法让业务层处理握手
 type Acceptor interface {
-	// Accept 返回error则断开连接
-	Accept(Conn, time.Duration) (string, error)
+	// Accept 返回一个握手完成的Channel对象或者一个error
+	// 业务层需要处理不同协议和网络环境下的连接握手协议
+	Accept(Conn, time.Duration) (string, Meta, error)
 }
 
 // StateListener 报告断开连接的事件
 type StateListener interface {
+	// Disconnect 连接断开回调
 	Disconnect(string) error
 }
 

@@ -4,7 +4,10 @@ import (
 	"X_IM/logger"
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
+	"github.com/gobwas/pool/pbufio"
+	"github.com/gobwas/ws"
 	"github.com/panjf2000/ants/v2"
 	"github.com/segmentio/ksuid"
 	"net"
@@ -17,6 +20,7 @@ type Upgrader interface {
 	Name() string
 	Upgrade(rawConn net.Conn, rd *bufio.Reader, wr *bufio.Writer) (Conn, error)
 }
+
 type ServerOptions struct {
 	LoginWait       time.Duration //登录超时
 	ReadWait        time.Duration //读超时
@@ -26,6 +30,18 @@ type ServerOptions struct {
 }
 
 type ServerOption func(*ServerOptions)
+
+func WithMessageGPool(val int) ServerOption {
+	return func(opts *ServerOptions) {
+		opts.MessageGPool = val
+	}
+}
+
+func WithConnectionGPool(val int) ServerOption {
+	return func(opts *ServerOptions) {
+		opts.ConnectionGPool = val
+	}
+}
 
 // DefaultServer is a websocket implement of the DefaultServer
 type DefaultServer struct {
@@ -41,7 +57,8 @@ type DefaultServer struct {
 	quit    int32
 }
 
-func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, options ...ServerOption) Server {
+// NewServer NewServer
+func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, options ...ServerOption) *DefaultServer {
 	defaultOpts := &ServerOptions{
 		LoginWait:       DefaultLoginWait,
 		ReadWait:        DefaultReadWait,
@@ -61,12 +78,7 @@ func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, op
 	}
 }
 
-type defaultAcceptor struct {
-}
-
-func (a *defaultAcceptor) Accept(conn Conn, timeout time.Duration) (string, error) {
-	return ksuid.New().String(), nil
-}
+// Start server
 func (s *DefaultServer) Start() error {
 	log := logger.WithFields(logger.Fields{
 		"module": s.Name(),
@@ -88,16 +100,12 @@ func (s *DefaultServer) Start() error {
 	if err != nil {
 		return err
 	}
-	//采用协程池来增加复用
-	mgpool, NewPoolErr := ants.NewPool(s.options.MessageGPool, ants.WithPreAlloc(true))
-	if NewPoolErr != nil {
-		//TODO if panic?
-		log.Warn("NewPoolErr:", NewPoolErr)
-	}
+	// 采用协程池来增加复用
+	mgpool, _ := ants.NewPool(s.options.MessageGPool, ants.WithPreAlloc(true))
 	defer func() {
 		mgpool.Release()
 	}()
-	log.Info("Started")
+	log.Info("started")
 
 	for {
 		rawConn, err := lst.Accept()
@@ -108,51 +116,131 @@ func (s *DefaultServer) Start() error {
 			log.Warn(err)
 			continue
 		}
-		//处理连接中的消息
+
 		go s.connHandler(rawConn, mgpool)
-		//原子操作来检查Server是否需要退出，结束循环
+
 		if atomic.LoadInt32(&s.quit) == 1 {
 			break
 		}
 	}
-	log.Info("Quited")
+	log.Info("quit")
 	return nil
 }
-func (s *DefaultServer) connHandler(conn net.Conn, mgpool *ants.Pool) {
-	//TODO implement me
-	return
-}
-func (s *DefaultServer) SetAcceptor(acceptor Acceptor) {
-	//TODO implement me
-	panic("implement me")
-}
 
-func (s *DefaultServer) SetMessageListener(listener MessageListener) {
-	//TODO implement me
-	panic("implement me")
-}
+func (s *DefaultServer) connHandler(rawConn net.Conn, gpool *ants.Pool) {
+	rd := pbufio.GetReader(rawConn, ws.DefaultServerReadBufferSize)
+	wr := pbufio.GetWriter(rawConn, ws.DefaultServerWriteBufferSize)
+	defer func() {
+		pbufio.PutReader(rd)
+		pbufio.PutWriter(wr)
+	}()
+	conn, err := s.Upgrade(rawConn, rd, wr)
+	if err != nil {
+		logger.Errorf("Upgrade error: %v", err)
+		_ = rawConn.Close()
+		return
+	}
+	id, meta, err := s.Accept(conn, s.options.LoginWait)
+	if err != nil {
+		_ = conn.WriteFrame(OpClose, []byte(err.Error()))
+		_ = conn.Close()
+		return
+	}
 
-func (s *DefaultServer) SetStateListener(listener StateListener) {
-	//TODO implement me
-	panic("implement me")
-}
+	if _, ok := s.Get(id); ok {
+		_ = conn.WriteFrame(OpClose, []byte("channelId is repeated"))
+		_ = conn.Close()
+		return
+	}
+	if meta == nil {
+		meta = Meta{}
+	}
+	channel := NewChannel(id, meta, conn, gpool)
+	channel.SetReadWait(s.options.ReadWait)
+	channel.SetWriteWait(s.options.WriteWait)
+	s.Add(channel)
 
-func (s *DefaultServer) SetReadWait(duration time.Duration) {
-	//TODO implement me
-	panic("implement me")
-}
+	//gaugeWithLabel := channelTotalGauge.WithLabelValues(s.ServiceID(), s.ServiceName())
+	//gaugeWithLabel.Inc()
+	//defer gaugeWithLabel.Dec()
 
-func (s *DefaultServer) SetChannelMap(channelMap ChannelMap) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *DefaultServer) Push(id string, data []byte) error {
-	//TODO implement me
-	panic("implement me")
+	logger.Infof("accept channel - ID: %s RemoteAddr: %s", channel.ID(), channel.RemoteAddr())
+	err = channel.ReadLoop(s.MessageListener)
+	if err != nil {
+		logger.Info(err)
+	}
+	s.Remove(channel.ID())
+	_ = s.Disconnect(channel.ID())
+	_ = channel.Close()
 }
 
 func (s *DefaultServer) Shutdown(ctx context.Context) error {
-	//TODO implement me
-	panic("implement me")
+	log := logger.WithFields(logger.Fields{
+		"module": s.Name(),
+		"id":     s.ServiceID(),
+	})
+	s.once.Do(func() {
+		defer func() {
+			log.Infoln("shutdown")
+		}()
+		if atomic.CompareAndSwapInt32(&s.quit, 0, 1) {
+			return
+		}
+
+		// close channels
+		channels := s.ChannelMap.All()
+		for _, ch := range channels {
+			_ = ch.Close()
+
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				continue
+			}
+		}
+	})
+	return nil
+}
+
+// Push string channelID
+// []byte data
+func (s *DefaultServer) Push(id string, data []byte) error {
+	ch, ok := s.ChannelMap.Get(id)
+	if !ok {
+		return errors.New("channel no found")
+	}
+	return ch.Push(data)
+}
+
+// SetAcceptor SetAcceptor
+func (s *DefaultServer) SetAcceptor(acceptor Acceptor) {
+	s.Acceptor = acceptor
+}
+
+// SetMessageListener SetMessageListener
+func (s *DefaultServer) SetMessageListener(listener MessageListener) {
+	s.MessageListener = listener
+}
+
+// SetStateListener SetStateListener
+func (s *DefaultServer) SetStateListener(listener StateListener) {
+	s.StateListener = listener
+}
+
+func (s *DefaultServer) SetChannelMap(channels ChannelMap) {
+	s.ChannelMap = channels
+}
+
+// SetReadWait set read wait duration
+func (s *DefaultServer) SetReadWait(ReadWait time.Duration) {
+	s.options.ReadWait = ReadWait
+}
+
+type defaultAcceptor struct {
+}
+
+// Accept defaultAcceptor
+func (a *defaultAcceptor) Accept(conn Conn, timeout time.Duration) (string, Meta, error) {
+	return ksuid.New().String(), Meta{}, nil
 }

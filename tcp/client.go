@@ -48,10 +48,13 @@ func NewClientWithProps(id, name string, meta map[string]string, opts ClientOpti
 		options: opts,
 		Meta:    meta,
 	}
+	logger.Infoln("in tcp/client.go:NewClientWithProps():succeed.")
 	return cli
 }
 
 func (c *Client) Connect(addr string) error {
+	logger.Infoln("in tcp/client.go:Connect():arrived here.")
+
 	_, err := url.Parse(addr)
 	if err != nil {
 		return err
