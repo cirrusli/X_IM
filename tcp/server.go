@@ -9,7 +9,6 @@ import (
 type Upgrader struct {
 }
 
-// NewServer NewServer
 func NewServer(listen string, service x.ServiceRegistration, options ...x.ServerOption) x.Server {
 	return x.NewServer(listen, service, new(Upgrader), options...)
 }

@@ -77,6 +77,7 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, error) {
 		RemoteIP:  getIP(conn.RemoteAddr().String()),
 	})
 	//7.将login转发给服务
+	//todo:
 	// 登陆服务与聊天服务在一个进程内部，主要是方便测试。如果改成login
 	// 就要使用两个配置分别启动一个login和chat服务，因此这里就把它们合在一起了
 	err = container.Forward(common.SNLogin, req)
@@ -138,6 +139,7 @@ func getIP(remoteAddr string) string {
 	}
 	return ipExp.ReplaceAllString(remoteAddr, "")
 }
+
 func generateChannelID(serviceID, account string) string {
 	return fmt.Sprintf("%s_%s_%d", serviceID, account, common.Seq.Next())
 }

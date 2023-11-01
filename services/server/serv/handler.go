@@ -107,6 +107,6 @@ func (d *ServerDispatcher) Push(gateway string, channels []string, p *pkt.LogicP
 
 // Disconnect default listener
 func (h *Handler) Disconnect(id string) error {
-	logger.Warnf("close event of %s", id)
+	logger.Warnf("in services/server/serv/handler.go:Disconnect(): close event of %s", id)
 	return nil
 }

@@ -40,12 +40,13 @@ message MessageResp {
     int64 messageID = 1;
     int64 sendTime = 2;
 }
-
+//消息转发包
 message MessagePush {
     int64 messageID = 1;
     int32 type = 2;
     string body = 3;
     string extra = 4;
+    //Header中未标注的消息发送者
     string sender = 5;
     int64 sendTime = 6;
 }

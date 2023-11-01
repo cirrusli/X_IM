@@ -5,6 +5,8 @@ import (
 	"sync/atomic"
 )
 
+//思想来源于k8s的events
+
 //Event仅是做简单封闭，方便调用
 //Event与ctx, cancel := context.WithCancel(context.Background())的作用相同
 //Fire方法等价cancel()
