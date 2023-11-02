@@ -3,7 +3,7 @@ package pkt
 import (
 	"X_IM/wire/common"
 	"X_IM/wire/endian"
-	"encoding/json"
+
 	"fmt"
 	"google.golang.org/protobuf/proto"
 	"io"
@@ -106,14 +106,14 @@ func (p *LogicPkt) Encode(w io.Writer) error {
 
 // ReadBody val must be a pointer
 func (p *LogicPkt) ReadBody(val proto.Message) error {
-	return json.Unmarshal(p.Body, val)
+	return proto.Unmarshal(p.Body, val)
 }
 
 func (p *LogicPkt) WriteBody(val proto.Message) *LogicPkt {
 	if val == nil {
 		return p
 	}
-	p.Body, _ = json.Marshal(val)
+	p.Body, _ = proto.Marshal(val)
 	return p
 }
 
@@ -149,7 +149,11 @@ func (p *LogicPkt) AddStringMeta(key, value string) {
 
 // GetMeta extra value
 func (p *LogicPkt) GetMeta(key string) (interface{}, bool) {
-	for _, m := range p.Meta {
+	return FindMeta(p.Meta, key)
+}
+
+func FindMeta(meta []*Meta, key string) (interface{}, bool) {
+	for _, m := range meta {
 		if m.Key == key {
 			switch m.Type {
 			case MetaType_int:
