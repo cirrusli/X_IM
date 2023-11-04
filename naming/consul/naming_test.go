@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func Test_Naming(t *testing.T) {
+func TestNaming(t *testing.T) {
 	//consul http default port 8500
 	nm, err := NewNaming("localhost:8500")
 	assert.Nil(t, err)
@@ -31,7 +31,7 @@ func Test_Naming(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
-	//2.find service
+	//2.find restful
 	srvs, err := nm.Find(serviceName)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(srvs))
@@ -40,7 +40,7 @@ func Test_Naming(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	//3.subscribe new service
+	//3.subscribe new restful
 	_ = nm.Subscribe(serviceName, func(services []x.ServiceRegistration) {
 		t.Log(len(services))
 
@@ -66,11 +66,11 @@ func Test_Naming(t *testing.T) {
 
 	_ = nm.Unsubscribe(serviceName)
 
-	//5.find service
+	//5.find restful
 	srvs, err = nm.Find(serviceName, "gateway")
 	assert.Equal(t, 2, len(srvs))
 
-	//6.find service to verify tag
+	//6.find restful to verify tag
 	srvs, _ = nm.Find(serviceName, "tag2")
 	assert.Equal(t, 1, len(srvs))
 	assert.Equal(t, "test_2", srvs[0].ServiceID())
@@ -79,7 +79,7 @@ func Test_Naming(t *testing.T) {
 	err = nm.Deregister("test_2")
 	assert.Nil(t, err)
 
-	//8.find service to verify deregister
+	//8.find restful to verify deregister
 	srvs, err = nm.Find(serviceName)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(srvs))

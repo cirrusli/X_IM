@@ -23,6 +23,10 @@ type Options struct {
 	LogLevel      string
 }
 
+func init() {
+	std.SetReportCaller(true)
+}
+
 // WithRotationCount set rotation count of log files
 func WithRotationCount(v int) Option {
 	return func(opts *Options) {

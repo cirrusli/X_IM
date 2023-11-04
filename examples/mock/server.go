@@ -8,6 +8,7 @@ import (
 	"X_IM/websocket"
 	"errors"
 	"net/http"
+	_ "net/http/pprof"
 	"time"
 )
 
@@ -51,14 +52,14 @@ func (h *ServerHandler) Accept(conn x.Conn, timeout time.Duration) (string, x.Me
 	if err != nil {
 		return "", nil, err
 	}
-	logger.Info("in examples/mock/server.go:Accept(): received an opcode:", frame.GetOpCode())
+	logger.Info("in examples/mock/logic.go:Accept(): received an opcode:", frame.GetOpCode())
 	// 2. 解析：数据包内容就是userId
 	userID := string(frame.GetPayload())
 	// 3. 鉴权：这里只是为了示例做一个fake验证，非空
 	if userID == "" {
 		return "", nil, errors.New("user id is invalid")
 	}
-	logger.Infof("in examples/mock/server.go:Accept(): logined %s", userID)
+	logger.Infof("in examples/mock/logic.go:Accept(): logined %s", userID)
 	return userID, nil, nil
 }
 
@@ -70,6 +71,6 @@ func (h *ServerHandler) Receive(ag x.Agent, payload []byte) {
 
 // Disconnect default listener
 func (h *ServerHandler) Disconnect(id string) error {
-	logger.Warnf("in examples/mock/server.go:Disconnect(): disconnecter id: %s", id)
+	logger.Warnf("in examples/mock/logic.go:Disconnect(): disconnecter id: %s", id)
 	return nil
 }

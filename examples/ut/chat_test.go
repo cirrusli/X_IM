@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func Test_UserTalk(t *testing.T) {
+func TestUserTalk(t *testing.T) {
 	cli1, err := dialer.Login(wsurl, "test1")
 	assert.Nil(t, err)
 	if err != nil {
@@ -56,7 +56,7 @@ func Test_UserTalk(t *testing.T) {
 	t.Log(&push)
 }
 
-func Test_GroupTalk(t *testing.T) {
+func TestGroupTalk(t *testing.T) {
 	// 1. test1 登录
 	cli1, err := dialer.Login(wsurl, "test1")
 	assert.Nil(t, err)

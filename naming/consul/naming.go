@@ -71,7 +71,7 @@ func (n *Naming) load(serviceName string, waitIndex uint64, tags ...string) ([]x
 	services := make([]x.ServiceRegistration, len(catalogServices))
 	for i, s := range catalogServices {
 		if s.Checks.AggregatedStatus() != api.HealthPassing {
-			logger.Debugf("load service: id:%s name:%s %s:%d status:%s",
+			logger.Debugf("load restful: id:%s name:%s %s:%d status:%s",
 				s.ServiceID, s.ServiceName, s.ServiceAddress, s.ServicePort, s.Checks.AggregatedStatus())
 			continue
 		}
@@ -85,7 +85,7 @@ func (n *Naming) load(serviceName string, waitIndex uint64, tags ...string) ([]x
 			Meta:     s.ServiceMeta,
 		}
 	}
-	logger.Debugf("load service: %v, meta:%v", services, meta)
+	logger.Debugf("load restful: %v, meta:%v", services, meta)
 	return services, meta, nil
 }
 func (n *Naming) Register(s x.ServiceRegistration) error {
@@ -128,7 +128,7 @@ func (n *Naming) Subscribe(serviceName string, callback func([]x.ServiceRegistra
 	n.Lock()
 	defer n.Unlock()
 	if _, ok := n.watches[serviceName]; ok {
-		return errors.New("service name has already been registered")
+		return errors.New("restful name has already been registered")
 	}
 	w := &Watch{
 		Service:  serviceName,

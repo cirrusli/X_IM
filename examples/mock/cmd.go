@@ -22,7 +22,7 @@ func NewClientCmd(ctx context.Context) *cobra.Command {
 			return runCli(ctx, opts)
 		},
 	}
-	cmd.PersistentFlags().StringVarP(&opts.addr, "address", "a", "ws://localhost:8000", "server address")
+	cmd.PersistentFlags().StringVarP(&opts.addr, "address", "a", "ws://localhost:8000", "logic address")
 	cmd.PersistentFlags().StringVarP(&opts.protocol, "protocol", "p", "ws", "protocol ws or tcp")
 	return cmd
 }
@@ -38,7 +38,7 @@ func NewServerCmd(ctx context.Context) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "mock_srv",
-		Short: "start server",
+		Short: "start logic",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runSrv(ctx, opts)
 		},
