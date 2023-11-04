@@ -2,7 +2,7 @@ package handler
 
 import (
 	x "X_IM"
-	"X_IM/services/server/service"
+	"X_IM/services/logic/restful"
 	"X_IM/wire/pkt"
 	"X_IM/wire/rpc"
 	"errors"
@@ -12,11 +12,11 @@ import (
 var ErrNoDestination = errors.New("no destination")
 
 type ChatHandler struct {
-	msgService   service.Message
-	groupService service.Group
+	msgService   restful.Message
+	groupService restful.Group
 }
 
-func NewChatHandler(msg service.Message, group service.Group) *ChatHandler {
+func NewChatHandler(msg restful.Message, group restful.Group) *ChatHandler {
 	return &ChatHandler{
 		msgService:   msg,
 		groupService: group,
@@ -158,7 +158,7 @@ func (h *ChatHandler) DoTalkAck(ctx x.Context) {
 		return
 	}
 	//
-	err := h.msgService.SetAck(ctx.Session().GetApp(), &rpc.AckMessageReq{
+	err := h.msgService.SetACK(ctx.Session().GetApp(), &rpc.AckMessageReq{
 		Account:   ctx.Session().GetAccount(),
 		MessageID: req.GetMessageID(),
 	})

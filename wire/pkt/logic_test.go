@@ -10,6 +10,7 @@ import (
 )
 
 func TestProtoEncode(t *testing.T) {
+	//直接设置魔数为logic(即前四个byte)
 	arr := []byte{195, 17, 163, 101, 0, 0, 0, 16, 10, 12, 108, 111, 103, 105, 110, 46, 115, 105, 103, 110, 105, 110, 24, 1, 0, 0, 0, 148, 10, 140, 1, 101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 73, 85, 122, 73, 49, 78, 105, 73, 115, 73, 110, 82, 53, 99, 67, 73, 54, 73, 107, 112, 88, 86, 67, 74, 57, 46, 101, 121, 74, 104, 89, 50, 77, 105, 79, 105, 74, 48, 90, 88, 78, 48, 77, 83, 73, 115, 73, 109, 70, 119, 99, 67, 73, 54, 73, 109, 116, 112, 98, 83, 73, 115, 73, 109, 86, 52, 99, 67, 73, 54, 77, 84, 89, 121, 79, 84, 65, 53, 77, 122, 85, 48, 79, 88, 48, 46, 80, 95, 121, 107, 49, 75, 77, 66, 53, 118, 57, 114, 105, 85, 121, 48, 121, 87, 52, 101, 79, 84, 103, 67, 48, 107, 48, 113, 101, 66, 54, 88, 82, 106, 105, 104, 52, 100, 76, 49, 120, 71, 107, 34, 3, 119, 101, 98}
 	buf := bytes.NewBuffer(arr)
 	got, err := Read(buf)
@@ -31,7 +32,9 @@ func TestReadPkt(t *testing.T) {
 	seq := common.Seq.Next()
 
 	packet := New("auth.login.aa", WithSeq(seq), WithStatus(Status_Success))
-	assert.Equal(t, "auth", packet.ServiceName())
+	if assert.Equal(t, "auth", packet.ServiceName()) {
+		t.Log("service name:", packet.ServiceName())
+	}
 	// assert.Equal(t, "login.aa", packet.CommandPath())
 
 	packet = New(common.CommandLoginSignIn, WithSeq(seq), WithStatus(Status_Success))
@@ -51,11 +54,14 @@ func TestReadPkt(t *testing.T) {
 	buf := new(bytes.Buffer)
 	_ = packet.Encode(buf)
 
-	t.Log(buf.Bytes())
-	// r := bytes.NewBuffer(Marshal(packet))
-	//
+	t.Log("after proto.Marshal and endian.WriteBytes\n",
+		"in Header struct,with protoimpls fields first", buf.Bytes())
+	r := bytes.NewBuffer(Marshal(packet))
+	t.Log("after pkt.Marshal , send to read\n", r.Bytes())
 
-	got, err := Read(buf)
+	got, err := Read(r)
+	assert.Nil(t, err)
+
 	p := got.(*LogicPkt)
 	assert.Nil(t, err)
 	assert.Equal(t, common.CommandLoginSignIn, p.Command)

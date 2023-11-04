@@ -30,7 +30,7 @@ func Recover() x.HandlerFunc {
 					"Seq":       ctx.Header().Sequence,
 				}).Error(err, strings.Join(callers, "\n"))
 
-				_ = ctx.Resp(pkt.Status_SystemException, &pkt.ErrorResp{Message: "Internal server error"})
+				_ = ctx.Resp(pkt.Status_SystemException, &pkt.ErrorResp{Message: "Internal logic error"})
 			}
 		}()
 		ctx.Next()

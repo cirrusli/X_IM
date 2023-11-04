@@ -13,33 +13,34 @@ import (
 	"time"
 )
 
+const (
+	MetaKeyApp     = "app"
+	MetaKeyAccount = "account"
+)
+
 var log = logger.WithFields(logger.Fields{
-	"service": "gateway",
-	"pkg":     "serv",
+	"occult": "gateway",
+	"pkg":    "serv",
 })
 
 type Handler struct {
 	ServiceID string
+	AppSecret string
 }
 
-func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, error) {
-	log := logger.WithFields(logger.Fields{
-		"ServiceID": h.ServiceID,
-		"module":    "Handler",
-		"handler":   "Accept",
-	})
-	log.Infoln("Accept")
-	// 1. 读取客户端发送的握手数据（登录包）
+// Accept this connection
+func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, error) {
+	// 1. 读取登录包
 	_ = conn.SetReadDeadline(time.Now().Add(timeout))
 	frame, err := conn.ReadFrame()
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	buf := bytes.NewBuffer(frame.GetPayload())
 	req, err := pkt.MustReadLogicPkt(buf)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	//2. 必须为登录包
 	if req.Command != common.CommandLoginSignIn {
@@ -47,26 +48,31 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, error) {
 		res.Status = pkt.Status_InvalidCommand
 		_ = conn.WriteFrame(x.OpBinary, pkt.Marshal(res))
 
-		return "", fmt.Errorf("is an \"InvalidCommand\" command")
+		return "", nil, fmt.Errorf("is an \"InvalidCommand\" command")
 	}
 	//3.unmarshal Body
 	var login pkt.LoginReq
 	err = req.ReadBody(&login)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
-	//4.use DefaultSecret to parse token
-	tk, err := token.Parse(token.DefaultSecret, login.Token)
+	secret := h.AppSecret
+	if secret == "" {
+		secret = token.DefaultSecret
+	}
+	// 4. 使用默认的DefaultSecret 解析token
+	tk, err := token.Parse(secret, login.Token)
 	if err != nil {
 		//5.if token is invalid ,return Unauthenticated to SDK
-		res := pkt.NewFrom(&req.Header)
-		res.Status = pkt.Status_Unauthenticated
-		_ = conn.WriteFrame(x.OpBinary, pkt.Marshal(res))
+		resp := pkt.NewFrom(&req.Header)
+		resp.Status = pkt.Status_Unauthenticated
+		_ = conn.WriteFrame(x.OpBinary, pkt.Marshal(resp))
 
-		return "", err
+		return "", nil, err
 	}
 	//6.生成全局唯一的ChannelID
 	id := generateChannelID(h.ServiceID, tk.Account)
+	log.Infof("accept %v channel:%s", tk, id)
 
 	req.ChannelID = id
 	req.WriteBody(&pkt.Session{
@@ -76,18 +82,22 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, error) {
 		App:       tk.App,
 		RemoteIP:  getIP(conn.RemoteAddr().String()),
 	})
-	//7.将login转发给服务
-	//todo:
-	// 登陆服务与聊天服务在一个进程内部，主要是方便测试。如果改成login
-	// 就要使用两个配置分别启动一个login和chat服务，因此这里就把它们合在一起了
+	req.AddStringMeta(MetaKeyApp, tk.App)
+	req.AddStringMeta(MetaKeyAccount, tk.Account)
+
+	// 7. 把login.转发给Login服务
 	err = container.Forward(common.SNLogin, req)
 	if err != nil {
-		return "", err
+		log.Errorf("container.Forward :%v", err)
+		return "", nil, err
 	}
-	return id, nil
+	return id, x.Meta{
+		MetaKeyApp:     tk.App,
+		MetaKeyAccount: tk.Account,
+	}, nil
 }
 
-func (h *Handler) Receive(agent x.Agent, payload []byte) {
+func (h *Handler) Receive(ag x.Agent, payload []byte) {
 	buf := bytes.NewBuffer(payload)
 	packet, err := pkt.Read(buf)
 	if err != nil {
@@ -97,18 +107,28 @@ func (h *Handler) Receive(agent x.Agent, payload []byte) {
 	//处理心跳包
 	if basicPkt, ok := packet.(*pkt.BasicPkt); ok {
 		if basicPkt.Code == pkt.CodePing {
-			_ = agent.Push(pkt.Marshal(&pkt.BasicPkt{Code: pkt.CodePong}))
+			_ = ag.Push(pkt.Marshal(&pkt.BasicPkt{Code: pkt.CodePong}))
 		}
 		return
 	}
 	//转发给逻辑服务处理
 	if logicPkt, ok := packet.(*pkt.LogicPkt); ok {
-		logicPkt.ChannelID = agent.ID()
+		logicPkt.ChannelID = ag.ID()
+
+		messageInTotal.WithLabelValues(h.ServiceID, common.SNTGateway, logicPkt.Command).Inc()
+		messageInFlowBytes.WithLabelValues(h.ServiceID, common.SNTGateway, logicPkt.Command).Add(float64(len(payload)))
+
+		// 把meta注入到header中
+		if ag.GetMeta() != nil {
+			logicPkt.AddStringMeta(MetaKeyApp, ag.GetMeta()[MetaKeyApp])
+			logicPkt.AddStringMeta(MetaKeyAccount, ag.GetMeta()[MetaKeyAccount])
+		}
+
 		err = container.Forward(logicPkt.ServiceName(), logicPkt)
 		if err != nil {
 			logger.WithFields(logger.Fields{
 				"module": "Handler",
-				"id":     agent.ID(),
+				"id":     ag.ID(),
 				"cmd":    logicPkt.Command,
 				"dest":   logicPkt.Dest,
 			}).Error(err)

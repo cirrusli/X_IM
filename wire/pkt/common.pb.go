@@ -31,7 +31,7 @@ const (
 	Status_InvalidPacketBody Status = 101
 	Status_InvalidCommand    Status = 103
 	Status_Unauthenticated   Status = 105
-	// server error > 300
+	// logic error > 300
 	Status_SystemException Status = 500
 	Status_NotImplemented  Status = 501
 )

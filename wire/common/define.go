@@ -7,7 +7,7 @@ const (
 	AlgorithmHashSlots = "hashslots"
 )
 
-// Command defined data type between client and server
+// Command defined data type between client and logic
 const (
 	CommandLoginSignIn  = "login.signin"
 	CommandLoginSignOut = "login.signout"
@@ -29,7 +29,7 @@ const (
 // Meta Key of a packet
 const (
 	// MetaDestServer 由ServerDispatcher注入消息包: 消息将要送达的网关的serviceName
-	MetaDestServer = "dest.server"
+	MetaDestServer = "dest.logic"
 	// MetaDestChannels 消息将要送达的channels，即一条消息可推送给多个用户
 	MetaDestChannels = "dest.channels"
 )
@@ -47,9 +47,12 @@ const (
 const (
 	SNWGateway = "wgateway"
 	SNTGateway = "tgateway"
-	SNLogin    = "chat"    //login
-	SNChat     = "chat"    //chat
-	SNService  = "service" //rpc service
+	// SNLogin todo
+	// 登陆服务与聊天服务在一个进程内部，主要是方便测试。如果改成login
+	// 就要使用两个配置分别启动一个login和chat服务，因此这里就把它们合在一起了
+	SNLogin   = "chat"   //login
+	SNChat    = "chat"   //chat
+	SNService = "occult" //occult restful
 )
 
 type ServiceID string
@@ -64,9 +67,10 @@ var (
 )
 
 const (
-	OfflineMessageExpiresIn = time.Hour * 24 * 30
-	OfflineSyncIndexCount   = 3000
-	OfflineMessageStoreDays = 30 //days
+	OfflineReadIndexExpiresIn = time.Hour * 24 * 30 // 读索引在缓存中的过期时间
+	OfflineSyncIndexCount     = 2000                //单次同步消息索引的数量
+	OfflineMessageExpiresIn   = 15                  // 离线消息过期时间
+	MessageMaxCountPerPage    = 200                 // 同步消息内容时每页的最大数据
 )
 
 const (

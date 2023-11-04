@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseJwtToken(t *testing.T) {
+func TestParseJWT(t *testing.T) {
 	tk1 := &Token{
 		Account: "test1",
 		App:     "x_im",

@@ -56,7 +56,7 @@ func NewClientWithProps(id, name string, meta map[string]string, opts ClientOpti
 	return cli
 }
 
-// Connect to server
+// Connect to logic
 func (c *Client) Connect(addr string) error {
 	logger.Infoln("in websocket/client.go:Connect():arrived here.")
 
@@ -113,7 +113,7 @@ func (c *Client) ping(conn net.Conn) error {
 	if err != nil {
 		return err
 	}
-	logger.Tracef("%s send ping to server", c.id)
+	logger.Tracef("%s send ping to logic", c.id)
 	return wsutil.WriteClientMessage(conn, ws.OpPing, nil)
 }
 

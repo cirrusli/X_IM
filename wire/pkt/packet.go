@@ -35,6 +35,7 @@ func MustReadBasicPkt(r io.Reader) (*BasicPkt, error) {
 	return nil, fmt.Errorf("packet is not a basic packet")
 }
 
+// Read 从buf中读取magic code进行判断，随后根据magic code进行反序列化
 func Read(r io.Reader) (interface{}, error) {
 	magic := common.Magic{}
 	_, err := io.ReadFull(r, magic[:])
@@ -59,6 +60,7 @@ func Read(r io.Reader) (interface{}, error) {
 	}
 }
 
+// Marshal 根据类型写入魔数到buf，随后将序列化后的字节数组写入其后
 func Marshal(p Packet) []byte {
 	buf := new(bytes.Buffer)
 	kind := reflect.TypeOf(p).Elem()

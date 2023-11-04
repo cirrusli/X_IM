@@ -8,9 +8,11 @@ import (
 	"X_IM/naming/consul"
 	"X_IM/services/gateway/conf"
 	"X_IM/services/gateway/serv"
+	"X_IM/tcp"
 	"X_IM/websocket"
 	"X_IM/wire/common"
 	"context"
+	"fmt"
 	"github.com/spf13/cobra"
 	"time"
 )
@@ -18,9 +20,10 @@ import (
 type StartOptions struct {
 	config   string
 	protocol string
+	route    string
 }
 
-// NewServerStartCmd creates a new http server command
+// NewServerStartCmd creates a new http logic command
 func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 	opts := &StartOptions{}
 
@@ -36,19 +39,24 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 	return cmd
 }
 
-// RunServerStart run http server
+// RunServerStart run http logic
 func RunServerStart(ctx context.Context, opts *StartOptions, version string) error {
 	config, err := conf.Init(opts.config)
 	if err != nil {
 		return err
 	}
 	_ = logger.Init(logger.Settings{
-		Level: "trace",
+		Level:    "trace",
+		Filename: "./data/gateway.log",
 	})
 
 	handler := &serv.Handler{
 		ServiceID: config.ServiceID,
+		AppSecret: config.AppSecret,
 	}
+	meta := make(map[string]string)
+	meta[consul.KeyHealthURL] = fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.MonitorPort)
+	meta["domain"] = config.Domain
 
 	var srv x.Server
 	service := &naming.DefaultService{
@@ -58,9 +66,15 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		Port:     config.PublicPort,
 		Protocol: opts.protocol,
 		Tags:     config.Tags,
+		Meta:     meta,
+	}
+	srvOpts := []x.ServerOption{
+		x.WithConnectionGPool(config.ConnectionGPool), x.WithMessageGPool(config.MessageGPool),
 	}
 	if opts.protocol == "ws" {
-		srv = websocket.NewServer(config.Listen, service)
+		srv = websocket.NewServer(config.Listen, service, srvOpts...)
+	} else if opts.protocol == "tcp" {
+		srv = tcp.NewServer(config.Listen, service, srvOpts...)
 	}
 
 	srv.SetReadWait(time.Minute * 2)
@@ -69,6 +83,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 	srv.SetStateListener(handler)
 
 	_ = container.Init(srv, common.SNChat, common.SNLogin)
+	container.EnableMonitor(fmt.Sprintf(":%d", config.MonitorPort))
 
 	ns, err := consul.NewNaming(config.ConsulURL)
 	if err != nil {
@@ -78,6 +93,11 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 
 	// set a dialer
 	container.SetDialer(serv.NewDialer(config.ServiceID))
-
+	// use routeSelector
+	selector, err := serv.NewRouteSelector(opts.route)
+	if err != nil {
+		return err
+	}
+	container.SetSelector(selector)
 	return container.Start()
 }

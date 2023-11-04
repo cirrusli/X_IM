@@ -24,15 +24,16 @@ type Frame struct {
 	raw ws.Frame
 }
 
-// NewConn 用来包装WebSocket的底层连接
-func NewConn(conn net.Conn) *WsConn {
-	return &WsConn{
-		Conn: conn,
-		rd:   bufio.NewReaderSize(conn, DefaultReaderSize),
-		wr:   bufio.NewWriterSize(conn, DefaultWriterSize),
-	}
-}
+//// NewConn 用来包装WebSocket的底层连接
+//func NewConn(conn net.Conn) *WsConn {
+//	return &WsConn{
+//		Conn: conn,
+//		rd:   bufio.NewReaderSize(conn, DefaultReaderSize),
+//		wr:   bufio.NewWriterSize(conn, DefaultWriterSize),
+//	}
+//}
 
+// NewConnWithRW 用来包装WebSocket的底层连接，传入自定义的Reader和Writer，更加灵活
 func NewConnWithRW(conn net.Conn, rd *bufio.Reader, wr *bufio.Writer) *WsConn {
 	return &WsConn{
 		Conn: conn,

@@ -1,5 +1,7 @@
 package X_IM
 
+//重构tcp/websocket的server逻辑，抽离统一为default server
+
 import (
 	"X_IM/logger"
 	"bufio"
@@ -16,6 +18,7 @@ import (
 	"time"
 )
 
+// Upgrader 抽象握手升级逻辑
 type Upgrader interface {
 	Name() string
 	Upgrade(rawConn net.Conn, rd *bufio.Reader, wr *bufio.Writer) (Conn, error)
@@ -43,7 +46,6 @@ func WithConnectionGPool(val int) ServerOption {
 	}
 }
 
-// DefaultServer is a websocket implement of the DefaultServer
 type DefaultServer struct {
 	Upgrader
 	listen string
@@ -57,7 +59,6 @@ type DefaultServer struct {
 	quit    int32
 }
 
-// NewServer NewServer
 func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, options ...ServerOption) *DefaultServer {
 	defaultOpts := &ServerOptions{
 		LoginWait:       DefaultLoginWait,
@@ -78,7 +79,7 @@ func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, op
 	}
 }
 
-// Start server
+// Start logic
 func (s *DefaultServer) Start() error {
 	log := logger.WithFields(logger.Fields{
 		"module": s.Name(),
@@ -127,9 +128,12 @@ func (s *DefaultServer) Start() error {
 	return nil
 }
 
+// use pbufio's pool to reduce memory allocation
 func (s *DefaultServer) connHandler(rawConn net.Conn, gpool *ants.Pool) {
 	rd := pbufio.GetReader(rawConn, ws.DefaultServerReadBufferSize)
 	wr := pbufio.GetWriter(rawConn, ws.DefaultServerWriteBufferSize)
+	//回收缓冲池，防止被多个线程并发使用，导致数据混乱
+	//通过defer在get方法结束时回收
 	defer func() {
 		pbufio.PutReader(rd)
 		pbufio.PutWriter(wr)

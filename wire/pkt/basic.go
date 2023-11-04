@@ -16,7 +16,7 @@ type BasicPkt struct {
 	Body   []byte
 }
 
-// Decode 解码，从r中读取数据并到p中
+// Decode 解码，从r中读取数据到p中
 func (p *BasicPkt) Decode(r io.Reader) error {
 	var err error
 	if p.Code, err = endian.ReadUint16(r); err != nil {

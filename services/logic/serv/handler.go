@@ -33,20 +33,20 @@ func NewServHandler(r *x.Router, cache x.SessionStorage) *Handler {
 	}
 }
 
-func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, error) {
+func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, error) {
 	log.Infoln("accept")
 
 	_ = conn.SetReadDeadline(time.Now().Add(timeout))
 	frame, err := conn.ReadFrame()
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	var req pkt.InnerHandshakeReq
 	_ = proto.Unmarshal(frame.GetPayload(), &req)
 	log.Infoln("accept -- ", req.ServiceID)
 
-	return req.ServiceID, nil
+	return req.ServiceID, nil, nil
 }
 
 func (h *Handler) Receive(agent x.Agent, payload []byte) {
@@ -69,13 +69,13 @@ func (h *Handler) Receive(agent x.Agent, payload []byte) {
 		}
 	} else {
 		//todo: to be optimized
+
 		session, err = h.cache.Get(packet.ChannelID)
 		//session不存在，需要重新连接并登录
 		if errors.Is(err, x.ErrSessionNil) {
 			_ = RespErr(agent, packet, pkt.Status_SessionNotFound)
 			return
-		}
-		if err != nil {
+		} else if err != nil {
 			_ = RespErr(agent, packet, pkt.Status_SystemException)
 			return
 		}
@@ -92,7 +92,8 @@ func RespErr(agent x.Agent, p *pkt.LogicPkt, status pkt.Status) error {
 	packet.Status = status
 	packet.Flag = pkt.Flag_Response
 
-	return agent.Push(pkt.Marshal(packet))
+	packet.AddStringMeta(common.MetaDestChannels, p.Header.ChannelID)
+	return container.Push(agent.ID(), packet)
 }
 
 type ServerDispatcher struct {
@@ -107,6 +108,6 @@ func (d *ServerDispatcher) Push(gateway string, channels []string, p *pkt.LogicP
 
 // Disconnect default listener
 func (h *Handler) Disconnect(id string) error {
-	logger.Warnf("in services/server/serv/handler.go:Disconnect(): close event of %s", id)
+	logger.Warnf("in services/logic/serv/handler.go:Disconnect(): close event of %s", id)
 	return nil
 }

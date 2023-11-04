@@ -1,21 +1,35 @@
 package conf
 
 import (
+	x "X_IM"
 	"X_IM/logger"
+	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	ServiceID     string   `envconfig:"serviceId"`
-	ServiceName   string   `envconfig:"serviceName"`
-	Namespace     string   `envconfig:"namespace"`
-	Listen        string   `envconfig:"listen"`
-	PublicAddress string   `envconfig:"publicAddress"`
-	PublicPort    int      `envconfig:"publicPort"`
-	Tags          []string `envconfig:"tags"`
-	ConsulURL     string   `envconfig:"consulURL"`
+	ServiceID       string
+	ServiceName     string `default:"wgateway"`
+	Listen          string `default:":8000"`
+	PublicAddress   string
+	PublicPort      int `default:"8000"`
+	Tags            []string
+	Domain          string
+	ConsulURL       string
+	MonitorPort     int `default:"8001"`
+	AppSecret       string
+	LogLevel        string `default:"DEBUG"`
+	MessageGPool    int    `default:"10000"`
+	ConnectionGPool int    `default:"15000"`
+}
+
+func (c Config) String() string {
+	bts, _ := json.Marshal(c)
+	return string(bts)
 }
 
 // Init InitConfig
@@ -24,18 +38,27 @@ func Init(file string) (*Config, error) {
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("/etc/conf")
 
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("config file not found: %w", err)
-	}
-
 	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		return nil, err
-	}
 
-	err := envconfig.Process("", &config)
+	err := envconfig.Process("kim", &config)
 	if err != nil {
 		return nil, err
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		logger.Warn(err)
+	} else {
+		if err := viper.Unmarshal(&config); err != nil {
+			return nil, err
+		}
+	}
+
+	if config.ServiceID == "" {
+		localIP := x.GetLocalIP()
+		config.ServiceID = fmt.Sprintf("gate_%s", strings.ReplaceAll(localIP, ".", ""))
+	}
+	if config.PublicAddress == "" {
+		config.PublicAddress = x.GetLocalIP()
 	}
 	logger.Info(config)
 

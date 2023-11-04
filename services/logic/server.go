@@ -1,4 +1,4 @@
-package server
+package logic
 
 import (
 	x "X_IM"
@@ -6,9 +6,9 @@ import (
 	"X_IM/logger"
 	"X_IM/naming"
 	"X_IM/naming/consul"
-	"X_IM/services/server/conf"
-	"X_IM/services/server/handler"
-	"X_IM/services/server/serv"
+	"X_IM/services/logic/conf"
+	"X_IM/services/logic/handler"
+	"X_IM/services/logic/serv"
 	"X_IM/storage"
 	"X_IM/tcp"
 	"X_IM/wire/common"
@@ -21,19 +21,19 @@ type StartOptions struct {
 	serviceName string
 }
 
-// NewServerStartCmd creates a new http server command
+// NewServerStartCmd creates a new http logic command
 func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 	opts := &StartOptions{}
 
 	cmd := &cobra.Command{
-		Use:   "server",
-		Short: "Start a server",
+		Use:   "logic",
+		Short: "Start a logic server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return RunServerStart(ctx, opts, version)
 		},
 	}
 	cmd.PersistentFlags().StringVarP(&opts.config,
-		"config", "c", "./server/conf.yaml", "Config file")
+		"config", "c", "./logic/conf.yaml", "Config file")
 
 	cmd.PersistentFlags().StringVarP(&opts.serviceName,
 		"serviceName", "s", "chat", "defined a service name,option is login or chat")

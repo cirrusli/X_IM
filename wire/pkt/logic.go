@@ -89,7 +89,8 @@ func (p *LogicPkt) Decode(r io.Reader) error {
 	return nil
 }
 
-// Encode Header to writer
+// Encode Header to writer.
+// first use proto.Marshal
 func (p *LogicPkt) Encode(w io.Writer) error {
 	headerBytes, err := proto.Marshal(&p.Header)
 	if err != nil {
