@@ -2,7 +2,7 @@ package serv
 
 import (
 	x "X_IM"
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"X_IM/services/gateway/conf"
 	"X_IM/wire/pkt"
 	"hash/crc32"

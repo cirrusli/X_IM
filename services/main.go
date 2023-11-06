@@ -1,7 +1,7 @@
 package main
 
 import (
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"X_IM/services/gateway"
 	"X_IM/services/logic"
 	"X_IM/services/occult"

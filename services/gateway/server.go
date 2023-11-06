@@ -3,9 +3,9 @@ package gateway
 import (
 	x "X_IM"
 	"X_IM/container"
-	"X_IM/logger"
 	"X_IM/naming"
 	"X_IM/naming/consul"
+	"X_IM/pkg/logger"
 	"X_IM/services/gateway/conf"
 	"X_IM/services/gateway/serv"
 	"X_IM/tcp"

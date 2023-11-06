@@ -1,0 +1,1 @@
+time="2023-11-04T23:12:33+08:00" level=info msg="srv gate01:wgateway - deps map[chat:{}]" func=X_IM/container.Init file="D:/Gooo/Dev_Projects/X_IM/container/container.go:81" fields.func=Init func=X_IM/container.Init module=container

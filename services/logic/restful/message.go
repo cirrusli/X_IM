@@ -1,7 +1,7 @@
 package restful
 
 import (
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"X_IM/wire/rpc"
 	"fmt"
 	"github.com/go-resty/resty/v2"

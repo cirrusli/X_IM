@@ -3,9 +3,9 @@ package logic
 import (
 	x "X_IM"
 	"X_IM/container"
-	"X_IM/logger"
 	"X_IM/naming"
 	"X_IM/naming/consul"
+	"X_IM/pkg/logger"
 	"X_IM/services/logic/conf"
 	"X_IM/services/logic/handler"
 	"X_IM/services/logic/serv"

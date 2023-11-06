@@ -1,9 +1,9 @@
 package occult
 
 import (
-	"X_IM/logger"
 	"X_IM/naming"
 	"X_IM/naming/consul"
+	logger2 "X_IM/pkg/logger"
 	"X_IM/services/occult/handler"
 	"github.com/kataras/iris/v12/middleware/accesslog"
 	"github.com/spf13/cobra"
@@ -76,7 +76,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	if err != nil {
 		return err
 	}
-	_ = logger.Init(logger.Settings{
+	_ = logger2.Init(logger2.Settings{
 		Level:    config.LogLevel,
 		Filename: "./data/occult.log",
 	})
@@ -126,7 +126,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 			consul.KeyHealthURL: fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.PublicPort),
 		},
 	})
-	logger.Infoln("consul health URL is: ",
+	logger2.Infoln("consul health URL is: ",
 		fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.PublicPort))
 	defer func() {
 		_ = ns.Deregister(config.ServiceID)

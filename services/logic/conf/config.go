@@ -1,7 +1,7 @@
 package conf
 
 import (
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"fmt"
 	"log"
 	"time"

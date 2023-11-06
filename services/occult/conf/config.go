@@ -1,8 +1,8 @@
 package conf
 
 import (
-	x "X_IM"
-	"X_IM/logger"
+	x "X_IM/pkg"
+	"X_IM/pkg/logger"
 	"encoding/json"
 	"fmt"
 	"log"

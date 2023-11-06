@@ -1,8 +1,12 @@
 ServiceID: gate01
-ServiceName: "wgateway"
+ServiceName: wgateway
 Listen: ":8000"
-PublicAddress: "localhost"
+MonitorPort: 8001
 PublicPort: 8000
 Tags:
-  - gateway
+  - IDC:HZ_ALI
+Domain: ws://ximtest.com
 ConsulURL: localhost:8500
+AppSecret: ""
+MessageGPool: 5000
+ConnectionGPool: 15000
