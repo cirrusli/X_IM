@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.7
-// source: occult.proto
+// source: rpc.proto
 
 package rpc
 
@@ -1278,31 +1278,31 @@ func file_rpc_proto_rawDescGZIP() []byte {
 
 var file_rpc_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_rpc_proto_goTypes = []interface{}{
-	(*User)(nil),                         // 0: occult.User
-	(*Message)(nil),                      // 1: occult.Message
-	(*Member)(nil),                       // 2: occult.Member
-	(*InsertMessageReq)(nil),             // 3: occult.InsertMessageReq
-	(*InsertMessageResp)(nil),            // 4: occult.InsertMessageResp
-	(*AckMessageReq)(nil),                // 5: occult.AckMessageReq
-	(*CreateGroupReq)(nil),               // 6: occult.CreateGroupReq
-	(*CreateGroupResp)(nil),              // 7: occult.CreateGroupResp
-	(*JoinGroupReq)(nil),                 // 8: occult.JoinGroupReq
-	(*QuitGroupReq)(nil),                 // 9: occult.QuitGroupReq
-	(*GetGroupReq)(nil),                  // 10: occult.GetGroupReq
-	(*GetGroupResp)(nil),                 // 11: occult.GetGroupResp
-	(*GroupMembersReq)(nil),              // 12: occult.GroupMembersReq
-	(*GroupMembersResp)(nil),             // 13: occult.GroupMembersResp
-	(*GetOfflineMessageIndexReq)(nil),    // 14: occult.GetOfflineMessageIndexReq
-	(*GetOfflineMessageIndexResp)(nil),   // 15: occult.GetOfflineMessageIndexResp
-	(*MessageIndex)(nil),                 // 16: occult.MessageIndex
-	(*GetOfflineMessageContentReq)(nil),  // 17: occult.GetOfflineMessageContentReq
-	(*GetOfflineMessageContentResp)(nil), // 18: occult.GetOfflineMessageContentResp
+	(*User)(nil),                         // 0: rpc.User
+	(*Message)(nil),                      // 1: rpc.Message
+	(*Member)(nil),                       // 2: rpc.Member
+	(*InsertMessageReq)(nil),             // 3: rpc.InsertMessageReq
+	(*InsertMessageResp)(nil),            // 4: rpc.InsertMessageResp
+	(*AckMessageReq)(nil),                // 5: rpc.AckMessageReq
+	(*CreateGroupReq)(nil),               // 6: rpc.CreateGroupReq
+	(*CreateGroupResp)(nil),              // 7: rpc.CreateGroupResp
+	(*JoinGroupReq)(nil),                 // 8: rpc.JoinGroupReq
+	(*QuitGroupReq)(nil),                 // 9: rpc.QuitGroupReq
+	(*GetGroupReq)(nil),                  // 10: rpc.GetGroupReq
+	(*GetGroupResp)(nil),                 // 11: rpc.GetGroupResp
+	(*GroupMembersReq)(nil),              // 12: rpc.GroupMembersReq
+	(*GroupMembersResp)(nil),             // 13: rpc.GroupMembersResp
+	(*GetOfflineMessageIndexReq)(nil),    // 14: rpc.GetOfflineMessageIndexReq
+	(*GetOfflineMessageIndexResp)(nil),   // 15: rpc.GetOfflineMessageIndexResp
+	(*MessageIndex)(nil),                 // 16: rpc.MessageIndex
+	(*GetOfflineMessageContentReq)(nil),  // 17: rpc.GetOfflineMessageContentReq
+	(*GetOfflineMessageContentResp)(nil), // 18: rpc.GetOfflineMessageContentResp
 }
 var file_rpc_proto_depIdxs = []int32{
-	1,  // 0: occult.InsertMessageReq.message:type_name -> occult.Message
-	2,  // 1: occult.GroupMembersResp.users:type_name -> occult.Member
-	16, // 2: occult.GetOfflineMessageIndexResp.list:type_name -> occult.MessageIndex
-	1,  // 3: occult.GetOfflineMessageContentResp.list:type_name -> occult.Message
+	1,  // 0: rpc.InsertMessageReq.message:type_name -> rpc.Message
+	2,  // 1: rpc.GroupMembersResp.users:type_name -> rpc.Member
+	16, // 2: rpc.GetOfflineMessageIndexResp.list:type_name -> rpc.MessageIndex
+	1,  // 3: rpc.GetOfflineMessageContentResp.list:type_name -> rpc.Message
 	4,  // [4:4] is the sub-list for method output_type
 	4,  // [4:4] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
