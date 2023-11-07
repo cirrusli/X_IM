@@ -2,6 +2,7 @@ package storage
 
 import (
 	x "X_IM"
+	"X_IM/pkg"
 	"X_IM/wire/pkt"
 	"fmt"
 	"github.com/go-redis/redis/v7"
@@ -22,7 +23,7 @@ func NewRedisStorage(cli *redis.Client) x.SessionStorage {
 }
 func (r *RedisStorage) Add(session *pkt.Session) error {
 	// save x.Location
-	loc := x.Location{
+	loc := pkg.Location{
 		ChannelID: session.ChannelID,
 		GateID:    session.GateID,
 	}
@@ -58,8 +59,8 @@ func (r *RedisStorage) Delete(account string, channelId string) error {
 }
 
 // Get session by sessionID
-func (r *RedisStorage) Get(ChannelId string) (*pkt.Session, error) {
-	snKey := KeySession(ChannelId)
+func (r *RedisStorage) Get(ChannelID string) (*pkt.Session, error) {
+	snKey := KeySession(ChannelID)
 	bts, err := r.cli.Get(snKey).Bytes()
 	if err != nil {
 		if err == redis.Nil {
@@ -72,18 +73,18 @@ func (r *RedisStorage) Get(ChannelId string) (*pkt.Session, error) {
 	return &session, nil
 }
 
-func (r *RedisStorage) GetLocations(accounts ...string) ([]*x.Location, error) {
+func (r *RedisStorage) GetLocations(accounts ...string) ([]*pkg.Location, error) {
 	keys := KeyLocations(accounts...)
 	list, err := r.cli.MGet(keys...).Result()
 	if err != nil {
 		return nil, err
 	}
-	var result = make([]*x.Location, 0)
+	var result = make([]*pkg.Location, 0)
 	for _, l := range list {
 		if l == nil {
 			continue
 		}
-		var loc x.Location
+		var loc pkg.Location
 		_ = loc.Unmarshal([]byte(l.(string)))
 		result = append(result, &loc)
 	}
@@ -93,7 +94,7 @@ func (r *RedisStorage) GetLocations(accounts ...string) ([]*x.Location, error) {
 	return result, nil
 }
 
-func (r *RedisStorage) GetLocation(account string, device string) (*x.Location, error) {
+func (r *RedisStorage) GetLocation(account string, device string) (*pkg.Location, error) {
 	key := KeyLocation(account, device)
 	bts, err := r.cli.Get(key).Bytes()
 	if err != nil {
@@ -102,11 +103,12 @@ func (r *RedisStorage) GetLocation(account string, device string) (*x.Location, 
 		}
 		return nil, err
 	}
-	var loc x.Location
+	var loc pkg.Location
 	_ = loc.Unmarshal(bts)
 	return &loc, nil
 }
 
+// KeySession 转换为redis的key
 func KeySession(channel string) string {
 	return fmt.Sprintf("login:sn:%s", channel)
 }
@@ -125,3 +127,15 @@ func KeyLocations(accounts ...string) []string {
 	}
 	return arr
 }
+
+//func (r *RedisStorage) GetBySingleFlight(ChannelID string, g *singleflight.Group) (interface{}, error) {
+//	snKey := KeySession(ChannelID)
+//	bts, err, _ := g.Do(snKey, func() (interface{}, error) {
+//
+//		return
+//	})
+//
+//	var session pkt.Session
+//	_ = proto.Unmarshal(bts, &session)
+//	return &session, nil
+//}

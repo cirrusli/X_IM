@@ -29,20 +29,20 @@ func (h *ChatHandler) DoSingleTalk(ctx x.Context) {
 		_ = ctx.RespWithError(pkt.Status_NoDestination, ErrNoDestination)
 		return
 	}
-	//1.parse packet
+	// 1. 解包
 	var req pkt.MessageReq
 	if err := ctx.ReadBody(&req); err != nil {
 		_ = ctx.RespWithError(pkt.Status_InvalidPacketBody, err)
 		return
 	}
-	//2.get the receiver's location
+	// 2. 获取接收方的位置信息
 	receiver := ctx.Header().GetDest()
 	loc, err := ctx.GetLocation(receiver, "")
-	if err != nil {
+	if err != nil && errors.Is(err, x.ErrSessionNil) {
 		_ = ctx.RespWithError(pkt.Status_SystemException, err)
 		return
 	}
-	//3.store the offline messages
+	// 3. 保存离线消息
 	sendTime := time.Now().UnixNano()
 	resp, err := h.msgService.InsertUser(ctx.Session().GetApp(), &rpc.InsertMessageReq{
 		Sender:   ctx.Session().GetAccount(),
@@ -59,6 +59,7 @@ func (h *ChatHandler) DoSingleTalk(ctx x.Context) {
 		return
 	}
 	msgID := resp.MessageID
+
 	//4.if receiver is online,send the message to receiver
 	if loc != nil {
 		if err = ctx.Dispatch(&pkt.MessagePush{
@@ -73,7 +74,7 @@ func (h *ChatHandler) DoSingleTalk(ctx x.Context) {
 			return
 		}
 	}
-	//5.response
+	// 5. 返回一条resp消息
 	_ = ctx.Resp(pkt.Status_Success, &pkt.MessageResp{
 		MessageID: msgID,
 		SendTime:  sendTime,

@@ -2,7 +2,7 @@ package main
 
 import (
 	"X_IM/examples/mock"
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"context"
 	"flag"
 	"github.com/spf13/cobra"

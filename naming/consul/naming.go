@@ -2,8 +2,8 @@ package consul
 
 import (
 	x "X_IM"
-	"X_IM/logger"
 	"X_IM/naming"
+	"X_IM/pkg/logger"
 	"errors"
 	"fmt"
 	"github.com/hashicorp/consul/api"
@@ -16,6 +16,7 @@ const (
 	KeyHealthURL = "health_url"
 )
 
+// Watch 服务变化监听
 type Watch struct {
 	Service   string
 	Callback  func([]x.ServiceRegistration)
@@ -23,6 +24,7 @@ type Watch struct {
 	Quit      chan struct{}
 }
 
+// Naming consul服务发现
 type Naming struct {
 	sync.RWMutex
 	cli     *api.Client
@@ -46,7 +48,6 @@ func NewNaming(consulUrl string) (naming.Naming, error) {
 
 // Find 服务发现，支持通过tag查询
 func (n *Naming) Find(serviceName string, tags ...string) ([]x.ServiceRegistration, error) {
-
 	services, _, err := n.load(serviceName, 0, tags...)
 	if err != nil {
 		return nil, err
@@ -68,14 +69,14 @@ func (n *Naming) load(serviceName string, waitIndex uint64, tags ...string) ([]x
 		return nil, meta, err
 	}
 
-	services := make([]x.ServiceRegistration, len(catalogServices))
-	for i, s := range catalogServices {
+	services := make([]x.ServiceRegistration, 0, len(catalogServices))
+	for _, s := range catalogServices {
 		if s.Checks.AggregatedStatus() != api.HealthPassing {
-			logger.Debugf("load restful: id:%s name:%s %s:%d status:%s",
+			logger.Infof("load service: id:%s name:%s %s:%d status:%s",
 				s.ServiceID, s.ServiceName, s.ServiceAddress, s.ServicePort, s.Checks.AggregatedStatus())
 			continue
 		}
-		services[i] = &naming.DefaultService{
+		services = append(services, &naming.DefaultService{
 			ID:       s.ServiceID,
 			Name:     s.ServiceName,
 			Address:  s.ServiceAddress,
@@ -83,9 +84,9 @@ func (n *Naming) load(serviceName string, waitIndex uint64, tags ...string) ([]x
 			Protocol: s.ServiceMeta[KeyProtocol],
 			Tags:     s.ServiceTags,
 			Meta:     s.ServiceMeta,
-		}
+		})
 	}
-	logger.Debugf("load restful: %v, meta:%v", services, meta)
+	logger.Infof("load service: %v, meta:%v", services, meta)
 	return services, meta, nil
 }
 func (n *Naming) Register(s x.ServiceRegistration) error {
@@ -108,8 +109,7 @@ func (n *Naming) Register(s x.ServiceRegistration) error {
 		check := new(api.AgentServiceCheck)
 		check.CheckID = fmt.Sprintf("%s_normal", s.ServiceID())
 		check.HTTP = healthURL
-		// http timeout
-		check.Timeout = "1s"
+		check.Timeout = "1s" // http timeout
 		check.Interval = "10s"
 		// 服务故障20s后由Agent将其下线
 		check.DeregisterCriticalServiceAfter = "20s"
@@ -128,7 +128,7 @@ func (n *Naming) Subscribe(serviceName string, callback func([]x.ServiceRegistra
 	n.Lock()
 	defer n.Unlock()
 	if _, ok := n.watches[serviceName]; ok {
-		return errors.New("restful name has already been registered")
+		return errors.New("service name has already been registered")
 	}
 	w := &Watch{
 		Service:  serviceName,

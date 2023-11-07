@@ -26,7 +26,7 @@ func HashCode(key string) int {
 type HashSelector struct {
 }
 
-// Lookup a server
+// Lookup a logic
 func (s *HashSelector) Lookup(header *pkt.Header, srvs []x.Service) string {
 	ll := len(srvs)
 	code := HashCode(header.ChannelID)

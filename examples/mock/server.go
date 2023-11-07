@@ -2,8 +2,8 @@ package mock
 
 import (
 	x "X_IM"
-	"X_IM/logger"
 	"X_IM/naming"
+	"X_IM/pkg/logger"
 	"X_IM/tcp"
 	"X_IM/websocket"
 	"errors"

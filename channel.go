@@ -1,7 +1,7 @@
 package X_IM
 
 import (
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"errors"
 	"fmt"
 	"github.com/panjf2000/ants/v2"

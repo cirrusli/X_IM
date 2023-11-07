@@ -2,7 +2,7 @@ package websocket
 
 import (
 	x "X_IM"
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"bufio"
 	"github.com/gobwas/ws"
 	"net"

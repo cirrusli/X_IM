@@ -7,7 +7,9 @@ services:
   mysql:
     image: docker.io/library/mysql:8.0
     container_name: x_mysql
-    command: --default-authentication-plugin=mysql_native_password
+    # Plugin mysql_native_password reported: ''mysql_native_password' is deprecated
+    # and will be removed in a future release. Please use caching_sha2_password instead'
+    command: --default-authentication-plugin=caching_sha2_password
     restart: always
     networks:
       - xnet

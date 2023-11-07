@@ -19,8 +19,8 @@ const (
 )
 
 var log = logger.WithFields(logger.Fields{
-	"occult": "gateway",
-	"pkg":    "serv",
+	"service": "gateway",
+	"pkg":     "serv",
 })
 
 type Handler struct {
@@ -40,13 +40,14 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 	buf := bytes.NewBuffer(frame.GetPayload())
 	req, err := pkt.MustReadLogicPkt(buf)
 	if err != nil {
+		log.Error(err)
 		return "", nil, err
 	}
-	//2. 必须为登录包
+	// 2. 必须是登录包
 	if req.Command != common.CommandLoginSignIn {
-		res := pkt.NewFrom(&req.Header)
-		res.Status = pkt.Status_InvalidCommand
-		_ = conn.WriteFrame(x.OpBinary, pkt.Marshal(res))
+		resp := pkt.NewFrom(&req.Header)
+		resp.Status = pkt.Status_InvalidCommand
+		_ = conn.WriteFrame(x.OpBinary, pkt.Marshal(resp))
 
 		return "", nil, fmt.Errorf("is an \"InvalidCommand\" command")
 	}
@@ -78,7 +79,7 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 	req.WriteBody(&pkt.Session{
 		Account:   tk.Account,
 		ChannelID: id,
-		GateID:    id,
+		GateID:    h.ServiceID,
 		App:       tk.App,
 		RemoteIP:  getIP(conn.RemoteAddr().String()),
 	})
@@ -97,6 +98,7 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 	}, nil
 }
 
+// Receive default listener
 func (h *Handler) Receive(ag x.Agent, payload []byte) {
 	buf := bytes.NewBuffer(payload)
 	packet, err := pkt.Read(buf)
@@ -127,7 +129,7 @@ func (h *Handler) Receive(ag x.Agent, payload []byte) {
 		err = container.Forward(logicPkt.ServiceName(), logicPkt)
 		if err != nil {
 			logger.WithFields(logger.Fields{
-				"module": "Handler",
+				"module": "handler",
 				"id":     ag.ID(),
 				"cmd":    logicPkt.Command,
 				"dest":   logicPkt.Dest,

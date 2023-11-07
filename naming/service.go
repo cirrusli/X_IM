@@ -1,19 +1,9 @@
 package naming
 
-import "fmt"
-
-type ServiceRegistration interface {
-	ServiceID() string
-	ServiceName() string
-	PublicAddress() string //ip or domain
-	PublicPort() int
-	DialURL() string
-	GetProtocol() string
-	GetNamespace() string
-	GetTags() []string
-	GetMeta() map[string]string
-	String() string
-}
+import (
+	x "X_IM"
+	"fmt"
+)
 
 // DefaultService Service Impl
 type DefaultService struct {
@@ -27,7 +17,7 @@ type DefaultService struct {
 	Meta      map[string]string
 }
 
-func NewEntry(id, name, protocol string, address string, port int) ServiceRegistration {
+func NewEntry(id, name, protocol string, address string, port int) x.ServiceRegistration {
 	return &DefaultService{
 		ID:       id,
 		Name:     name,
@@ -38,9 +28,7 @@ func NewEntry(id, name, protocol string, address string, port int) ServiceRegist
 }
 
 // ServiceID returns the ServiceImpl ID
-func (e *DefaultService) ServiceID() string {
-	return e.ID
-}
+func (e *DefaultService) ServiceID() string { return e.ID }
 
 func (e *DefaultService) GetNamespace() string { return e.Namespace }
 

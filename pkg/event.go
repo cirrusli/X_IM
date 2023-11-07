@@ -1,4 +1,4 @@
-package X_IM
+package pkg
 
 import (
 	"sync"

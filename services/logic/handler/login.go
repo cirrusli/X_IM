@@ -15,20 +15,16 @@ func NewLoginHandler() *LoginHandler {
 }
 
 func (h *LoginHandler) DoLogin(ctx x.Context) {
+	log := logger.WithField("func", "DoLogin")
 	var session pkt.Session
 	if err := ctx.ReadBody(&session); err != nil {
 		_ = ctx.RespWithError(pkt.Status_InvalidPacketBody, err)
 		return
 	}
 
-	logger.WithFields(logger.Fields{
-		"Func":      "Login",
-		"ChannelID": session.GetChannelID(),
-		"Account":   session.GetAccount(),
-		"RemoteIP":  session.GetRemoteIP(),
-	}).Info("do Login")
+	log.Infof("do login of %v ", session.String())
 
-	//检测当前账号是否已在其他地方登录
+	// 2. 检查当前账号是否在其他地方登录
 	old, err := ctx.GetLocation(session.Account, "")
 	if err != nil && !errors.Is(err, x.ErrSessionNil) {
 		_ = ctx.RespWithError(pkt.Status_SystemException, err)
@@ -36,7 +32,7 @@ func (h *LoginHandler) DoLogin(ctx x.Context) {
 	}
 
 	if old != nil {
-		//将旧的连接关闭
+		//将旧的连接关闭，通知用户被踢下线
 		_ = ctx.Dispatch(&pkt.KickOutNotify{
 			//在web客户端由于网络IO都是异步操作，并且会自动重连
 			//不能使用account作为唯一标识，否则很容易导致自己踢自己下线
@@ -53,16 +49,14 @@ func (h *LoginHandler) DoLogin(ctx x.Context) {
 	//return login succeed
 	var resp = &pkt.LoginResp{
 		ChannelID: session.ChannelID,
+		Account:   session.Account,
 	}
 	_ = ctx.Resp(pkt.Status_Success, resp)
 }
 
 func (h *LoginHandler) DoLogout(ctx x.Context) {
-	logger.WithFields(logger.Fields{
-		"Func":      "Logout",
-		"ChannelID": ctx.Session().GetChannelID(),
-		"Account":   ctx.Session().GetAccount(),
-	}).Info("do Logout ")
+	logger.WithField("func", "DoLogout").Infof("do Logout of %s %s ",
+		ctx.Session().GetChannelID(), ctx.Session().GetAccount())
 
 	err := ctx.Delete(ctx.Session().GetAccount(), ctx.Session().GetChannelID())
 	if err != nil {

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	redisAddr = "20.115.1.240:6379"
+	redisAddr = "8.146.198.70:6379"
 )
 
 func InitRedis(addr string, pass string) (*redis.Client, error) {
@@ -31,8 +31,9 @@ func InitRedis(addr string, pass string) (*redis.Client, error) {
 	return redisDB, nil
 }
 
-func Test_crud(t *testing.T) {
-	c, err := InitRedis(redisAddr, "")
+func TestCRUD(t *testing.T) {
+	password := "Redis:0617"
+	c, err := InitRedis(redisAddr, password)
 	assert.Nil(t, err)
 
 	s := NewRedisStorage(c)

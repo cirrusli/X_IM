@@ -14,6 +14,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
+	_ "net/http/pprof"
 	"time"
 )
 
@@ -23,7 +24,7 @@ type StartOptions struct {
 	route    string
 }
 
-// NewServerStartCmd creates a new http logic command
+// NewServerStartCmd creates a new http logic server command
 func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 	opts := &StartOptions{}
 
@@ -35,11 +36,12 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 		},
 	}
 	cmd.PersistentFlags().StringVarP(&opts.config, "config", "c", "./gateway/conf.yaml", "Config file")
+	cmd.PersistentFlags().StringVarP(&opts.route, "route", "r", "./gateway/route.json", "route file")
 	cmd.PersistentFlags().StringVarP(&opts.protocol, "protocol", "p", "ws", "protocol of ws or tcp")
 	return cmd
 }
 
-// RunServerStart run http logic
+// RunServerStart run http logic server
 func RunServerStart(ctx context.Context, opts *StartOptions, version string) error {
 	config, err := conf.Init(opts.config)
 	if err != nil {

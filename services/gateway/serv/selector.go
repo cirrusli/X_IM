@@ -23,7 +23,7 @@ func NewRouteSelector(configPath string) (*RouteSelector, error) {
 	}, nil
 }
 
-// Lookup a logic
+// Lookup a logic server
 func (s *RouteSelector) Lookup(header *pkt.Header, srvs []x.Service) string {
 	// 1. 从header中读取Meta信息
 	app, _ := pkt.FindMeta(header.Meta, MetaKeyApp)
@@ -60,7 +60,7 @@ func (s *RouteSelector) Lookup(header *pkt.Header, srvs []x.Service) string {
 	zoneSrvs := filterSrvs(srvs, zone)
 	if len(zoneSrvs) == 0 {
 		noServerFoundErrorTotal.WithLabelValues(zone).Inc()
-		log.Warnf("selecting a random occult from all due to no occult found in zone %s", zone)
+		log.Warnf("selecting a random service from all due to no service found in zone %s", zone)
 		ri := rand.Intn(len(srvs))
 		return srvs[ri].ServiceID()
 	}

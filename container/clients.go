@@ -2,7 +2,7 @@ package container
 
 import (
 	x "X_IM"
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"sync"
 )
 
@@ -24,6 +24,7 @@ func NewClients(num int) ClientMap {
 	}
 }
 
+// Add Channel
 func (ch *ClientsImpl) Add(client x.Client) {
 	if client.ServiceID() == "" {
 		logger.WithFields(logger.Fields{
@@ -33,6 +34,7 @@ func (ch *ClientsImpl) Add(client x.Client) {
 	ch.clients.Store(client.ServiceID(), client)
 }
 
+// Remove added Channel
 func (ch *ClientsImpl) Remove(id string) {
 	ch.clients.Delete(id)
 }
@@ -51,7 +53,7 @@ func (ch *ClientsImpl) Get(id string) (x.Client, bool) {
 	return val.(x.Client), true
 }
 
-// Services 返回服务列表
+// Services 返回服务列表，可以传一对
 func (ch *ClientsImpl) Services(kvs ...string) []x.Service {
 	kvLen := len(kvs)
 	if kvLen != 0 && kvLen != 2 {

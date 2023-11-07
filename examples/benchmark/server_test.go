@@ -3,7 +3,7 @@ package benchmark
 import (
 	x "X_IM"
 	"X_IM/examples/mock"
-	"X_IM/logger"
+	"X_IM/pkg/logger"
 	"X_IM/websocket"
 	"fmt"
 	"github.com/panjf2000/ants/v2"
