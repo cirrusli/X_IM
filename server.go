@@ -114,7 +114,9 @@ type StateListener interface {
 	Disconnect(string) error
 }
 
+// MessageListener 监听消息
 type MessageListener interface {
+	// Receive 收到消息回调
 	Receive(Agent, []byte)
 }
 

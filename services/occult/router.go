@@ -3,7 +3,7 @@ package occult
 import (
 	"X_IM/naming"
 	"X_IM/naming/consul"
-	logger2 "X_IM/pkg/logger"
+	log "X_IM/pkg/logger"
 	"X_IM/services/occult/handler"
 	"github.com/kataras/iris/v12/middleware/accesslog"
 	"github.com/spf13/cobra"
@@ -61,7 +61,7 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "occult",
-		Short: "Start a RPC occult",
+		Short: "Start a RPC service",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return RunServerStart(ctx, opts, version)
 		},
@@ -70,13 +70,13 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 	return cmd
 }
 
-// RunServerStart run http logic
+// RunServerStart run http server
 func RunServerStart(ctx context.Context, opts *ServerStartOptions, version string) error {
 	config, err := conf.Init(opts.config)
 	if err != nil {
 		return err
 	}
-	_ = logger2.Init(logger2.Settings{
+	_ = log.Init(log.Settings{
 		Level:    config.LogLevel,
 		Filename: "./data/occult.log",
 	})
@@ -106,7 +106,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 		return err
 	}
 
-	rdb, err := conf.InitRedis(config.RedisAddrs, "")
+	rdb, err := conf.InitRedis(config.RedisAddrs, config.RedisPass)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	}
 	_ = ns.Register(&naming.DefaultService{
 		ID:       config.ServiceID,
-		Name:     common.SNService, // restful name
+		Name:     common.SNService, // service name
 		Address:  config.PublicAddress,
 		Port:     config.PublicPort,
 		Protocol: "http",
@@ -126,7 +126,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 			consul.KeyHealthURL: fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.PublicPort),
 		},
 	})
-	logger2.Infoln("consul health URL is: ",
+	log.Infoln("consul health URL is: ",
 		fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.PublicPort))
 	defer func() {
 		_ = ns.Deregister(config.ServiceID)
@@ -147,14 +147,14 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	app.UseRouter(ac.Handler)
 	app.UseRouter(setAllowedResponses)
 
-	// Start logic
+	// Start HTTP server
 	return app.Listen(config.Listen, iris.WithOptimizations)
 }
 
 func setAllowedResponses(ctx iris.Context) {
 	// Indicate that the Server can send JSON, XML, YAML and MessagePack for this request.
 	ctx.Negotiation().JSON().Protobuf().MsgPack()
-	// Add more, allowed by the logic format of responses, mime types here...
+	// Add more, allowed by the server format of responses, mime types here...
 
 	// If client is missing an "Accept: " header then default it to JSON.
 	ctx.Negotiation().Accept.JSON()

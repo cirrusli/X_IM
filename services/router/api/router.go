@@ -9,6 +9,7 @@ import (
 	"X_IM/wire/common"
 	"fmt"
 	"hash/crc32"
+	"log"
 	"time"
 
 	"github.com/kataras/iris/v12"
@@ -53,12 +54,13 @@ func (r *RouterApi) Lookup(c iris.Context) {
 	// step 3
 	region, ok := r.Config.Regions[regionID]
 	if !ok {
+		log.Println("region not found,will return with 500")
 		c.StopWithError(iris.StatusInternalServerError, err)
 		return
 	}
 
 	// step 4
-	idc := selectIdc(token, region)
+	idc := selectIDC(token, region)
 
 	// step 5
 	gateways, err := r.Naming.Find(common.SNWGateway, fmt.Sprintf("IDC:%s", idc.ID))
@@ -87,7 +89,7 @@ func (r *RouterApi) Lookup(c iris.Context) {
 	})
 }
 
-func selectIdc(token string, region *conf.Region) *conf.IDC {
+func selectIDC(token string, region *conf.Region) *conf.IDC {
 	slot := hashcode(token) % len(region.Slots)
 	i := region.Slots[slot]
 	return &region.IDCs[i]

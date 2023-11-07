@@ -74,7 +74,7 @@ func (ch *ChannelImpl) writeLoop() error {
 	return nil
 }
 
-// ID simpling logic
+// ID simpling server
 func (ch *ChannelImpl) ID() string { return ch.id }
 
 // Push 异步写数据

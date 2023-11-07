@@ -97,6 +97,7 @@ func (c *Client) Connect(addr string) error {
 func (c *Client) heartbeatLoop(conn net.Conn) error {
 	tick := time.NewTicker(c.options.Heartbeat)
 	for range tick.C {
+		// 发送一个ping的心跳包给服务端
 		if err := c.ping(conn); err != nil {
 			return err
 		}
@@ -117,6 +118,7 @@ func (c *Client) ping(conn net.Conn) error {
 	return wsutil.WriteClientMessage(conn, ws.OpPing, nil)
 }
 
+// Send data to connection
 func (c *Client) Send(payload []byte) error {
 
 	if atomic.LoadInt32(&c.state) == 0 {
@@ -135,7 +137,7 @@ func (c *Client) Send(payload []byte) error {
 // not thread safe!
 func (c *Client) Read() (x.Frame, error) {
 	if c.conn == nil {
-		return nil, errors.New("conn is nil")
+		return nil, errors.New("connection is nil")
 	}
 	if c.options.Heartbeat > 0 {
 		_ = c.conn.SetReadDeadline(time.Now().Add(c.options.ReadWait))
@@ -155,6 +157,7 @@ func (c *Client) Close() {
 		if c.conn == nil {
 			return
 		}
+		// graceful close connection
 		_ = wsutil.WriteClientMessage(c.conn, ws.OpClose, nil)
 
 		_ = c.conn.Close()
@@ -164,14 +167,6 @@ func (c *Client) Close() {
 
 func (c *Client) SetDialer(dialer x.Dialer) {
 	c.Dialer = dialer
-}
-
-func (c *Client) ID() string {
-	return c.id
-}
-
-func (c *Client) Name() string {
-	return c.name
 }
 
 func (c *Client) ServiceID() string {

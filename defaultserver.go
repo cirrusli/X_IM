@@ -79,7 +79,7 @@ func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, op
 	}
 }
 
-// Start logic
+// Start server
 func (s *DefaultServer) Start() error {
 	log := logger.WithFields(logger.Fields{
 		"module": s.Name(),

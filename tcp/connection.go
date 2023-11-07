@@ -37,11 +37,11 @@ func NewConnWithRW(conn net.Conn, rd *bufio.Reader, wr *bufio.Writer) *WrappedCo
 }
 
 func (c *WrappedConn) ReadFrame() (x.Frame, error) {
-	opcode, err := endian.ReadUint8(c.Conn)
+	opcode, err := endian.ReadUint8(c.rd)
 	if err != nil {
 		return nil, err
 	}
-	payload, err := endian.ReadBytes(c.Conn)
+	payload, err := endian.ReadBytes(c.rd)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (c *WrappedConn) ReadFrame() (x.Frame, error) {
 }
 
 func (c *WrappedConn) WriteFrame(code x.OpCode, payload []byte) error {
-	return WriteFrame(c.Conn, code, payload)
+	return WriteFrame(c.wr, code, payload)
 }
 func (c *WrappedConn) Flush() error {
 	return c.wr.Flush()

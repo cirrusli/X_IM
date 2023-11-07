@@ -1,12 +1,13 @@
 ServiceID: gate02
-ServiceName: wgateway
+ServiceName: tgateway #TCP gateway
 Listen: ":8010"
 MonitorPort: 8011
+PublicAddress: localhost # consul health check needed
 PublicPort: 8010
 Tags:
   - IDC:BJ_ALI
 Domain: ws://ximtest.com
-ConsulURL: localhost:8500
+ConsulURL: 8.146.198.70:8500
 AppSecret: ""
 MessageGPool: 5000
 ConnectionGPool: 15000

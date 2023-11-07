@@ -36,6 +36,7 @@ type Config struct {
 	Zone            string `default:"zone_ali_03"`
 	ConsulURL       string
 	RedisAddrs      string
+	RedisPass       string
 	OccultURL       string
 	LogLevel        string `default:"DEBUG"`
 	MessageGPool    int    `default:"5000"`

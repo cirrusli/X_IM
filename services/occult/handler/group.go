@@ -53,7 +53,7 @@ func (h *ServiceHandler) groupCreate(req *rpc.CreateGroupReq) (snowflake.ID, err
 			Group:   groupId.Base36(),
 		}
 	}
-
+	// 使用事务，保证数据的一致性
 	err := h.BaseDB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(g).Error; err != nil {
 			// return any will rollback

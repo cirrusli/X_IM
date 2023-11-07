@@ -1,13 +1,14 @@
 package X_IM
 
 import (
+	"X_IM/pkg/logger"
 	"sync"
 )
 
 type ChannelMap interface {
 	Add(channel Channel)
 	Remove(id string)
-	Get(id string) (Channel, bool)
+	Get(id string) (channel Channel, ok bool)
 	All() []Channel
 }
 
@@ -21,16 +22,37 @@ func NewChannels(num int) ChannelMap {
 	}
 }
 func (ch *ChannelsImpl) Add(channel Channel) {
-	//todo
+	if channel.ID() == "" {
+		logger.WithFields(logger.Fields{
+			"module": "ChannelsImpl",
+		}).Error("channel id is required")
+		return
+	}
+
+	ch.channels.Store(channel.ID(), channel)
 }
 func (ch *ChannelsImpl) Remove(id string) {
-	//todo
+	ch.channels.Delete(id)
 }
 func (ch *ChannelsImpl) Get(id string) (Channel, bool) {
-	//todo
-	return nil, false
+	if id == "" {
+		logger.WithFields(logger.Fields{
+			"module": "ChannelsImpl",
+		}).Error("channel id required")
+		return nil, false
+	}
+
+	val, ok := ch.channels.Load(id)
+	if !ok {
+		return nil, false
+	}
+	return val.(Channel), true
 }
 func (ch *ChannelsImpl) All() []Channel {
-	//todo
-	return nil
+	arr := make([]Channel, 0)
+	ch.channels.Range(func(key, val interface{}) bool {
+		arr = append(arr, val.(Channel))
+		return true
+	})
+	return arr
 }

@@ -7,7 +7,7 @@ const (
 	AlgorithmHashSlots = "hashslots"
 )
 
-// Command defined data type between client and logic
+// Command defined data type between client and server
 const (
 	CommandLoginSignIn  = "login.signin"
 	CommandLoginSignOut = "login.signout"
@@ -47,12 +47,9 @@ const (
 const (
 	SNWGateway = "wgateway"
 	SNTGateway = "tgateway"
-	// SNLogin todo
-	// 登陆服务与聊天服务在一个进程内部，主要是方便测试。如果改成login
-	// 就要使用两个配置分别启动一个login和chat服务，因此这里就把它们合在一起了
-	SNLogin   = "chat"   //login
-	SNChat    = "chat"   //chat
-	SNService = "occult" //occult restful
+	SNLogin    = "login"  //login
+	SNChat     = "chat"   //chat
+	SNService  = "occult" //rpc service
 )
 
 type ServiceID string

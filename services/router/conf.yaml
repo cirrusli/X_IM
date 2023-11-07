@@ -1,0 +1,3 @@
+Listen: ":8100"
+LogLevel: INFO
+ConsulURL: 8.146.198.70:8500

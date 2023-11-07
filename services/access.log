@@ -11,3 +11,19 @@
 2023-11-04 20:14:22|0s|200|GET|/health|::1|0 B|2 B||
 2023-11-04 20:14:32|0s|200|GET|/health|::1|0 B|2 B||
 2023-11-04 20:14:42|0s|200|GET|/health|::1|0 B|2 B||
+2023-11-07 20:20:43|511.1µs|404|POST|/api/app1/message|127.0.0.1|0 B|0 B||
+2023-11-07 20:20:53|0s|400|POST|/api/app1/message/user|127.0.0.1|0 B|3 B|error(EOF)|
+2023-11-07 20:21:08|0s|400|POST|/api/app1/message/group|127.0.0.1|0 B|3 B|error(EOF)|
+2023-11-07 20:21:52|0s|400|POST|/api/app1/message/ack|127.0.0.1|0 B|3 B|error(EOF)|
+2023-11-07 20:23:18|53.3403ms|500|GET|/api/app1/group/123|127.0.0.1|0 B|16 B|error(record not found)|
+2023-11-07 20:24:21|0s|400|POST|/api/app1/group|127.0.0.1|0 B|3 B|error(EOF)|
+2023-11-07 20:24:57|0s|400|POST|/api/app1/group/member|127.0.0.1|0 B|3 B|error(EOF)|
+2023-11-07 20:25:39|0s|404|DELETE|/api/app1/group/members/250|127.0.0.1|0 B|0 B||
+2023-11-07 20:26:21|52.492ms|200|GET|/api/app1/group/members/123|127.0.0.1|app=app1 id=123|0 B|3 B||
+2023-11-07 20:27:53|540.3µs|400|POST|/api/app1/offline/index|127.0.0.1|0 B|10 B|error(EOF)|
+2023-11-07 20:28:28|0s|400|POST|/api/app1/offline/content|127.0.0.1|0 B|10 B|error(EOF)|
+2023-11-07 20:28:30|0s|404|POST|/api/app1/offline/conten|127.0.0.1|0 B|0 B||
+2023-11-07 20:28:36|856.2µs|400|POST|/api/app1/offline/content|127.0.0.1|0 B|10 B|error(EOF)|
+2023-11-07 20:29:07|0s|404|POST|/health|127.0.0.1|0 B|0 B||
+2023-11-07 20:29:10|0s|200|GET|/health|127.0.0.1|0 B|2 B||
+2023-11-07 20:45:47|0s|200|GET|/health|127.0.0.1|0 B|2 B||

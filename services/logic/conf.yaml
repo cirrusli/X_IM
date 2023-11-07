@@ -1,12 +1,14 @@
 ServiceID: chat01
 Listen: ":8005"
+PublicAddress: localhost # consul health check needed
 MonitorPort: 8006
 PublicPort: 8005
 Tags:
   - logic
 Zone: zone_ali_03
-ConsulURL: localhost:8500
-RedisAddrs: localhost:6379
+ConsulURL: 8.146.198.70:8500
+RedisAddrs: 8.146.198.70:6379
+RedisPass: Redis:0617
 OccultURL: http://localhost:8080
 MessageGPool: 5000
 ConnectionGPool: 500

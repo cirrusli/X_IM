@@ -29,7 +29,7 @@ func Init(file string) (*Config, error) {
 
 	var config Config
 
-	err := envconfig.Process("x", &config)
+	err := envconfig.Process("x_im", &config)
 	if err != nil {
 		return nil, err
 	}

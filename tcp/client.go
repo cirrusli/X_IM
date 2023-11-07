@@ -51,6 +51,7 @@ func NewClientWithProps(id, name string, meta map[string]string, opts ClientOpti
 	return cli
 }
 
+// Connect to server
 func (c *Client) Connect(addr string) error {
 	logger.Infoln("in tcp/client.go:Connect():arrived here.")
 
@@ -97,13 +98,13 @@ func (c *Client) heartbeatLoop() error {
 }
 
 func (c *Client) ping() error {
-	logger.WithField("module", "tcp.client").Tracef("%s send ping to logic", c.id)
+	logger.WithField("module", "tcp.client").Tracef("%s send ping to server", c.id)
 
-	err := c.conn.SetWriteDeadline(time.Now().Add(c.options.WriteWait))
+	err := c.conn.WriteFrame(x.OpPing, nil)
 	if err != nil {
 		return err
 	}
-	return c.conn.WriteFrame(x.OpPing, nil)
+	return c.conn.Flush()
 }
 
 func (c *Client) Send(payload []byte) error {
@@ -112,16 +113,16 @@ func (c *Client) Send(payload []byte) error {
 	}
 	c.Lock()
 	defer c.Unlock()
-	err := c.conn.SetWriteDeadline(time.Now().Add(c.options.WriteWait))
+	err := c.conn.WriteFrame(x.OpBinary, payload)
 	if err != nil {
 		return err
 	}
-	return c.conn.WriteFrame(x.OpBinary, payload)
+	return c.conn.Flush()
 }
 
 func (c *Client) Read() (x.Frame, error) {
 	if c.conn == nil {
-		return nil, fmt.Errorf("connection is nil")
+		return nil, errors.New("connection is nil")
 	}
 	if c.options.Heartbeat > 0 {
 		_ = c.conn.SetReadDeadline(time.Now().Add(c.options.ReadWait))
@@ -143,12 +144,13 @@ func (c *Client) Close() {
 		}
 		// graceful close connection
 		_ = WriteFrame(c.conn, x.OpClose, nil)
-
+		_ = c.conn.Flush()
 		_ = c.conn.Close()
 		atomic.CompareAndSwapInt32(&c.state, 1, 0)
 	})
 }
 
+// SetDialer 设置握手逻辑
 func (c *Client) SetDialer(dialer x.Dialer) {
 	c.Dialer = dialer
 }

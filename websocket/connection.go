@@ -24,14 +24,14 @@ type Frame struct {
 	raw ws.Frame
 }
 
-//// NewConn 用来包装WebSocket的底层连接
-//func NewConn(conn net.Conn) *WsConn {
-//	return &WsConn{
-//		Conn: conn,
-//		rd:   bufio.NewReaderSize(conn, DefaultReaderSize),
-//		wr:   bufio.NewWriterSize(conn, DefaultWriterSize),
-//	}
-//}
+// NewConn 用来包装WebSocket的底层连接
+func NewConn(conn net.Conn) x.Conn {
+	return &WsConn{
+		Conn: conn,
+		rd:   bufio.NewReaderSize(conn, DefaultReaderSize),
+		wr:   bufio.NewWriterSize(conn, DefaultWriterSize),
+	}
+}
 
 // NewConnWithRW 用来包装WebSocket的底层连接，传入自定义的Reader和Writer，更加灵活
 func NewConnWithRW(conn net.Conn, rd *bufio.Reader, wr *bufio.Writer) *WsConn {
@@ -45,7 +45,7 @@ func NewConnWithRW(conn net.Conn, rd *bufio.Reader, wr *bufio.Writer) *WsConn {
 func (c *WsConn) ReadFrame() (x.Frame, error) {
 	logger.Infoln("in websocket/connection.go:ReadFrame():arrived here.")
 
-	f, err := ws.ReadFrame(c.Conn)
+	f, err := ws.ReadFrame(c.rd)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,8 @@ func (c *WsConn) WriteFrame(op x.OpCode, payload []byte) error {
 	//在websocket协议中第一个bit位就是fin，表示当前帧是否为连续帧中的最后一帧
 	//由于我们的数据包大小不会超过一个websocket协议单个帧最大值
 	//因此这里fin直接为true，也就是不会把包拆分成多个。
-	return ws.WriteFrame(c.Conn, ws.NewFrame(ws.OpCode(op), true, payload))
+	f := ws.NewFrame(ws.OpCode(op), true, payload)
+	return ws.WriteFrame(c.wr, f)
 }
 
 func (f *Frame) SetOpCode(opCode x.OpCode) {
@@ -69,7 +70,7 @@ func (f *Frame) GetOpCode() x.OpCode {
 }
 
 func (c *WsConn) Flush() error {
-	return nil
+	return c.wr.Flush()
 }
 
 // SetPayload

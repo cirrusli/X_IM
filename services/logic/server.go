@@ -95,7 +95,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 	r.Handle(common.CommandOfflineIndex, offlineHandler.DoSyncIndex)
 	r.Handle(common.CommandOfflineContent, offlineHandler.DoSyncContent)
 
-	rdb, err := conf.InitRedis(config.RedisAddrs, "")
+	rdb, err := conf.InitRedis(config.RedisAddrs, config.RedisPass)
 	if err != nil {
 		return err
 	}

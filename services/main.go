@@ -5,6 +5,7 @@ import (
 	"X_IM/services/gateway"
 	"X_IM/services/logic"
 	"X_IM/services/occult"
+	"X_IM/services/router"
 	"context"
 	"flag"
 	"github.com/spf13/cobra"
@@ -26,6 +27,7 @@ func main() {
 	root.AddCommand(gateway.NewServerStartCmd(ctx, version))
 	root.AddCommand(logic.NewServerStartCmd(ctx, version))
 	root.AddCommand(occult.NewServerStartCmd(ctx, version))
+	root.AddCommand(router.NewServerStartCmd(ctx, version))
 
 	if err := root.Execute(); err != nil {
 		logger.WithError(err).Fatal("Could not run command")

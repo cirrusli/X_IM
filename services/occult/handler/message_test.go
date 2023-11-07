@@ -14,12 +14,12 @@ import (
 var handler ServiceHandler
 
 func init() {
-	baseDb, _ := database.InitDB("mysql", "root:lzq@tcp(127.0.0.1:3306)/x_base?charset=utf8mb4&parseTime=True&loc=Local")
-	messageDb, _ := database.InitDB("mysql", "root:lzq@tcp(127.0.0.1:3306)/x_message?charset=utf8mb4&parseTime=True&loc=Local")
+	baseDB, _ := database.InitDB("mysql", "root:lzq@tcp(8.146.198.70:3306)/x_base?charset=utf8mb4&parseTime=True&loc=Local")
+	messageDB, _ := database.InitDB("mysql", "root:lzq@tcp(8.146.198.70:3306)/x_message?charset=utf8mb4&parseTime=True&loc=Local")
 	idgen, _ := database.NewIDGenerator(1)
 	handler = ServiceHandler{
-		MessageDB: messageDb,
-		BaseDB:    baseDb,
+		MessageDB: messageDB,
+		BaseDB:    baseDB,
 		IDGen:     idgen,
 	}
 }

@@ -2,12 +2,11 @@ package X_IM
 
 import (
 	"X_IM/wire/pkt"
-	"errors"
 	"fmt"
 	"sync"
 )
 
-var ErrSessionLost = errors.New("err:session lost")
+//var ErrSessionLost = errors.New("err:session lost")
 
 // Router defines
 type Router struct {
@@ -74,6 +73,7 @@ func handleNotFound(ctx Context) {
 	_ = ctx.Resp(pkt.Status_NotImplemented, &pkt.ErrorResp{Message: "NotImplemented"})
 }
 
+// FuncTree is a tree structure
 type FuncTree struct {
 	nodes map[string]HandlersChain
 }
@@ -84,6 +84,10 @@ func NewTree() *FuncTree {
 
 // Add a handler to tree
 func (t *FuncTree) Add(path string, handlers ...HandlerFunc) {
+	if t.nodes[path] == nil {
+		t.nodes[path] = HandlersChain{}
+	}
+
 	t.nodes[path] = append(t.nodes[path], handlers...)
 }
 

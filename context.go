@@ -1,7 +1,7 @@
 package X_IM
 
 import (
-	common2 "X_IM/pkg"
+	"X_IM/pkg"
 	"X_IM/pkg/logger"
 	"X_IM/wire/common"
 	"X_IM/wire/pkt"
@@ -32,7 +32,7 @@ type Context interface {
 	// Resp 给发送方回复一条消息
 	Resp(status pkt.Status, body proto.Message) error
 	// Dispatch 给指定的接收方发送一条消息
-	Dispatch(body proto.Message, recvs ...*common2.Location) error
+	Dispatch(body proto.Message, recvs ...*pkg.Location) error
 	Next()
 }
 
@@ -73,7 +73,7 @@ func (c *ContextImpl) Next() {
 	}
 	f(c)
 	//todo is that necessary?
-	c.Next()
+	//c.Next()
 }
 
 func (c *ContextImpl) reset() {
@@ -114,8 +114,7 @@ func (c *ContextImpl) Resp(status pkt.Status, body proto.Message) error {
 	packet.Status = status
 	packet.WriteBody(body)
 	packet.Flag = pkt.Flag_Response
-
-	logger.Debugf("<-- Resp to %s command:%s  status: %v body: %s",
+	logger.Infof("<-- Resp to %s command:%s  status: %v body: %s",
 		c.Session().GetAccount(), &c.request.Header, status, body)
 
 	err := c.Push(c.Session().GetGateID(),
@@ -127,7 +126,7 @@ func (c *ContextImpl) Resp(status pkt.Status, body proto.Message) error {
 }
 
 // Dispatch 采用合并转发
-func (c *ContextImpl) Dispatch(body proto.Message, recvs ...*common2.Location) error {
+func (c *ContextImpl) Dispatch(body proto.Message, recvs ...*pkg.Location) error {
 	if len(recvs) == 0 {
 		return nil
 	}

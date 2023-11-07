@@ -6,7 +6,6 @@ type IDGenerator struct {
 	node *snowflake.Node
 }
 
-// NewIDGenerator NewIDGenerator
 func NewIDGenerator(nodeID int64) (*IDGenerator, error) {
 	node, err := snowflake.NewNode(nodeID)
 	if err != nil {

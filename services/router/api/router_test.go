@@ -9,7 +9,7 @@ import (
 )
 
 func TestSelectIDC(t *testing.T) {
-	got := selectIdc("test1", &conf.Region{
+	got := selectIDC("test1", &conf.Region{
 		IDCs: []conf.IDC{
 			{ID: "SH_ALI"},
 			{ID: "HZ_ALI"},

@@ -3,9 +3,9 @@ package dialer
 import (
 	x "X_IM"
 	"X_IM/pkg/logger"
+	"X_IM/pkg/token"
 	"X_IM/wire/common"
 	"X_IM/wire/pkt"
-	"X_IM/wire/token"
 	"bytes"
 	"context"
 	"fmt"
