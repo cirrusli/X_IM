@@ -4,60 +4,68 @@
 
 ![技术选型](./assets/technicalSelect.png)
 
+## 项目启动
+
+### docker部署相关依赖
+
+MySQL、Redis、Consul
+
+```bash
+docker-compose -f "docker-compose.yml" up -d --build
+```
+
+### 服务启动
+
+Gateway、Router、Logic、Occult
+    
+```bash
+    cd services
+    go run main.go [gateway/router/logic/occult]
+```
 ### 项目目录结构
 
-#### assets
+```bash
+├─assets
+│  └─data
+├─container
+├─examples
+│  ├─benchmark
+│  ├─dialer
+│  ├─mock
+│  └─ut
+├─naming
+│  └─consul
+├─pkg
+│  ├─logger
+│  ├─middleware
+│  └─token
+├─services
+│  ├─data
+│  ├─gateway
+│  │  ├─conf
+│  │  └─serv
+│  ├─logic
+│  │  ├─conf
+│  │  ├─handler
+│  │  ├─restful
+│  │  └─serv
+│  ├─occult
+│  │  ├─conf
+│  │  ├─database
+│  │  └─handler
+│  └─router
+│      ├─api
+│      ├─conf
+│      ├─data
+│      └─ip
+├─storage
+├─tcp
+├─websocket
+└─wire
+    ├─common
+    ├─endian
+    ├─pkt
+    ├─protofiles
+    └─rpc
 
-md依赖的图片文件等
-
-#### container
-
-容器层，服务托管
-
-#### examples
-
-各种mock、benchmark测试示例
-
-#### gateway
-
-网关层，负载均衡，管理长连接
-
-#### logger
-
-系统的日志模块，使用logrus库
-
-#### naming
-
-容器层，服务注册与发现
-
-抽象通用的注册中心接口，可以更便捷地接入其他注册中心
-
-使用consul，DNS做服务发现
-
-#### tcp
-
-通信层，处理tcp的数据
-
-#### websocket
-
-通信层，处理websocket的数据
-
-#### wire
-
-协议层，字节序、proto文件、自定义序列化等
-
-##### channel.go
-
-通信层，channel实现
-
-##### channels.go
-
-通信层
-
-##### client.go
-
-##### default_server.go
-
-##### server.go
-
-定义了通信层的接口，如channel
+```
