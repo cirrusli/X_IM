@@ -1,0 +1,61 @@
+version: '3.8'
+services:
+  router:
+    image: docker.io/cirrusli/x_im:router-v1.0
+    container_name: router
+    restart: always
+    networks:
+      - xnet
+    ports:
+      - "8100:8100"
+    environment:
+      X_CONSULURL: consul:8500
+      X_LOGLEVEL: INFO
+  occult:
+    image: docker.io/cirrusli/x_im:occult-v1.0
+    container_name: occult
+    restart: always
+    networks:
+      - xnet
+    ports:
+      - "8080:8080"
+    environment:
+      X_PUBLICADDRESS: occult
+      X_CONSULURL: consul:8500
+      X_REDISADDRS: redis:6379
+      X_BASEDB: root:lzq@tcp(mysql:3306)/x_base?charset=utf8mb4&parseTime=True&loc=Local
+      X_MESSAGEDB: root:lzq@tcp(mysql:3306)/x_message?charset=utf8mb4&parseTime=True&loc=Local
+      X_LOGLEVEL: DEBUG
+  gateway:
+    image: docker.io/cirrusli/x_im:gateway-v1.0
+    container_name: wgateway
+    restart: always
+    networks:
+      - xnet
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    environment:
+      X_PUBLICADDRESS: gateway
+      X_CONSULURL: consul:8500
+      X_LOGLEVEL: DEBUG
+      X_TAGS: IDC:SH_ALI
+      X_DOMAIN: ws://localhost:8000
+  logic:
+    image: docker.io/cirrusli/x_im:logic-v1.0
+    container_name: chat
+    restart: always
+    networks:
+      - xnet
+    ports:
+      - "8005:8005"
+      - "8006:8006"
+    environment:
+      X_PUBLICADDRESS: logic
+      X_CONSULURL: consul:8500
+      X_REDISADDRS: redis:6379
+      X_LOGLEVEL: DEBUG
+      X_OCCULTURL: http://occult:8080
+    dns: consul
+networks:
+  xnet: {}

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+#  go:
+#    image: docker.io/library/go:1.21
+#    container_name: x_go
+  mysql:
+    image: docker.io/library/mysql:8.0
+    container_name: x_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    networks:
+      - xnet
+    ports:
+      - "3306:3306"
+    volumes:
+      - ~/data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: lzq
+  redis:
+    image: docker.io/library/redis:6.2
+    container_name: x_redis
+    command: redis-server --requirepass Redis:0617
+    networks:
+      - xnet
+    ports:
+      - "6379:6379"
+    volumes:
+      - ~/data/redis:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  consul:
+    image: docker.io/library/consul:1.15
+    container_name: x_consul
+    networks:
+      - xnet
+    ports:
+      - '8300:8300'
+      - '8301:8301'
+      - '8301:8301/udp'
+      - '8500:8500'
+      - '5353:53'
+      - '5353:53/udp'
+    command: agent -dev -dns-port=53 -recursor=8.8.8.8 -ui -client=0.0.0.0
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+      CONSUL_ALLOW_PRIVILEGED_PORTS: 53
+networks:
+  xnet: {}
