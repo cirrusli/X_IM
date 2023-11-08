@@ -21,3 +21,4 @@
 go.work
 /README_en.md
 *.log
+/docs/
