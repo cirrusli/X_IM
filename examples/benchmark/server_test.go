@@ -15,7 +15,7 @@ import (
 
 const wsurl = "ws://localhost:8000"
 
-func Test_Parallel(t *testing.T) {
+func TestParallel(t *testing.T) {
 	const doConns = 10000
 	gpool, _ := ants.NewPool(50, ants.WithPreAlloc(true))
 	defer gpool.Release()
@@ -53,7 +53,7 @@ func Test_Parallel(t *testing.T) {
 	}
 }
 
-func Test_Message(t *testing.T) {
+func TestMessage(t *testing.T) {
 	const msgs = 1000 * 100
 	cli := websocket.NewClient(fmt.Sprintf("test_%v", 1), "client", websocket.ClientOptions{
 		Heartbeat: x.DefaultHeartbeat,

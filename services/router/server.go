@@ -1,12 +1,16 @@
 package router
 
 import (
+	"X_IM/naming"
 	"X_IM/naming/consul"
 	"X_IM/pkg/logger"
 	"X_IM/services/router/api"
 	"X_IM/services/router/conf"
 	"X_IM/services/router/ip"
+	"X_IM/wire/common"
 	"context"
+	"fmt"
+	"github.com/prometheus/common/log"
 	"path"
 
 	"github.com/kataras/iris/v12"
@@ -67,7 +71,22 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	if err != nil {
 		return err
 	}
-
+	_ = ns.Register(&naming.DefaultService{
+		ID:       config.ServiceID,
+		Name:     common.SNRouter,
+		Address:  config.PublicAddress,
+		Port:     config.PublicPort,
+		Protocol: "http",
+		Tags:     config.Tags,
+		Meta: map[string]string{
+			consul.KeyHealthURL: fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.PublicPort),
+		},
+	})
+	log.Infoln("consul health URL is: ",
+		fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.PublicPort))
+	defer func() {
+		_ = ns.Deregister(config.ServiceID)
+	}()
 	router := api.RouterApi{
 		Naming:   ns,
 		IpRegion: region,
@@ -88,6 +107,6 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 		routerAPI.Get("/:token", router.Lookup)
 	}
 
-	// Start server
+	// Start HTTP server
 	return app.Listen(config.Listen, iris.WithOptimizations)
 }

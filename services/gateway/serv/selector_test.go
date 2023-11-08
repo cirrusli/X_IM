@@ -43,7 +43,7 @@ func TestSelectorLookup(t *testing.T) {
 	assert.Nil(t, err)
 
 	packet := pkt.New(common.CommandChatUserTalk, pkt.WithChannel(ksuid.New().String()))
-	packet.AddStringMeta(MetaKeyApp, "kim")
+	packet.AddStringMeta(MetaKeyApp, "x_im")
 	packet.AddStringMeta(MetaKeyAccount, "test1")
 	hit := rs.Lookup(&packet.Header, srvs)
 	assert.Equal(t, "s6", hit)

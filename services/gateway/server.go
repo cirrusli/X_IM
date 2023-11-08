@@ -18,11 +18,20 @@ import (
 	"time"
 )
 
+// StartOptions is the options for start command
 type StartOptions struct {
 	config   string
 	protocol string
 	route    string
 }
+
+const (
+	confWS    = "./gateway/conf.yaml"
+	confTCP   = "./gateway/conf2.yaml"
+	routePath = "./gateway/route.json"
+	protocol  = "ws" //如果没有在命令行指定的话，就用这个默认值
+	logPath   = "./data/gateway.log"
+)
 
 // NewServerStartCmd creates a new http logic server command
 func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
@@ -35,9 +44,9 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 			return RunServerStart(ctx, opts, version)
 		},
 	}
-	cmd.PersistentFlags().StringVarP(&opts.config, "config", "c", "./gateway/conf.yaml", "Config file")
-	cmd.PersistentFlags().StringVarP(&opts.route, "route", "r", "./gateway/route.json", "route file")
-	cmd.PersistentFlags().StringVarP(&opts.protocol, "protocol", "p", "ws", "protocol of ws or tcp")
+	cmd.PersistentFlags().StringVarP(&opts.config, "config", "c", confWS, "Config file")
+	cmd.PersistentFlags().StringVarP(&opts.route, "route", "r", routePath, "route file")
+	cmd.PersistentFlags().StringVarP(&opts.protocol, "protocol", "p", protocol, "protocol of ws or tcp")
 	return cmd
 }
 
@@ -49,7 +58,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 	}
 	_ = logger.Init(logger.Settings{
 		Level:    "trace",
-		Filename: "./data/gateway.log",
+		Filename: logPath,
 	})
 
 	handler := &serv.Handler{

@@ -92,7 +92,7 @@ func Start() error {
 	if !atomic.CompareAndSwapUint32(&c.state, stateInitialized, stateStarted) {
 		return errors.New("already started")
 	}
-	//1.start logic server
+	//1.start server
 	go func(srv x.Server) {
 		err := srv.Start()
 		if err != nil {
@@ -120,7 +120,7 @@ func Start() error {
 
 	//wait the quit signal from system
 	c := make(chan os.Signal, 1)
-	//todo :why not syscall.Signal? add os.Interrupt to adapt Windows?
+
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	log.Infoln("shutdown signal:", <-c)
@@ -163,7 +163,7 @@ func pushMessage(packet *pkt.LogicPkt) error {
 	return nil
 }
 
-// Forward message to restful service of Client
+// Forward message to client service of Client
 func Forward(serviceName string, packet *pkt.LogicPkt) error {
 	if packet == nil {
 		return errors.New("packet is nil")
@@ -323,9 +323,9 @@ func buildClient(clients ClientMap,
 	}
 	//2.服务之间只允许使用TCP
 	if service.GetProtocol() != string(common.ProtocolTCP) {
-		return nil, fmt.Errorf("unexpected restful protocol:%s", service.GetProtocol())
+		return nil, fmt.Errorf("unexpected service protocol:%s", service.GetProtocol())
 	}
-	//3.build client and connect to restful
+	//3.build client and connect to client
 	cli := tcp.NewClientWithProps(id, name, meta, tcp.ClientOptions{
 		Heartbeat: x.DefaultHeartbeat,
 		ReadWait:  x.DefaultReadWait,

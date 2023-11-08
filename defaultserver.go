@@ -59,6 +59,8 @@ type DefaultServer struct {
 	quit    int32
 }
 
+// NewServer 设置server的参数，返回一个server对象
+// 随后由container启动server
 func NewServer(listen string, service ServiceRegistration, upgrader Upgrader, options ...ServerOption) *DefaultServer {
 	defaultOpts := &ServerOptions{
 		LoginWait:       DefaultLoginWait,
@@ -106,7 +108,7 @@ func (s *DefaultServer) Start() error {
 	defer func() {
 		mgpool.Release()
 	}()
-	log.Info("started")
+	log.Infoln("default server started")
 
 	for {
 		rawConn, err := lst.Accept()

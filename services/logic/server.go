@@ -7,10 +7,10 @@ import (
 	"X_IM/naming/consul"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/middleware"
+	"X_IM/services/logic/client"
 	"X_IM/services/logic/conf"
 	"X_IM/services/logic/handler"
-	"X_IM/services/logic/restful"
-	"X_IM/services/logic/serv"
+	"X_IM/services/logic/server"
 	"X_IM/storage"
 	"X_IM/tcp"
 	"X_IM/wire/common"
@@ -57,18 +57,18 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		Filename: "./data/server.log",
 	})
 
-	var groupService restful.Group
-	var messageService restful.Message
+	var groupService client.Group
+	var messageService client.Message
 	if strings.TrimSpace(config.OccultURL) != "" {
-		groupService = restful.NewGroupService(config.OccultURL)
-		messageService = restful.NewMessageService(config.OccultURL)
+		groupService = client.NewGroupService(config.OccultURL)
+		messageService = client.NewMessageService(config.OccultURL)
 	} else {
 		srvRecord := &resty.SRVRecord{
 			Domain:  "consul",
 			Service: common.SNService,
 		}
-		groupService = restful.NewGroupServiceWithSRV("http", srvRecord)
-		messageService = restful.NewMessageServiceWithSRV("http", srvRecord)
+		groupService = client.NewGroupServiceWithSRV("http", srvRecord)
+		messageService = client.NewMessageServiceWithSRV("http", srvRecord)
 	}
 
 	r := x.NewRouter()
@@ -100,7 +100,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		return err
 	}
 	cache := storage.NewRedisStorage(rdb)
-	servHandler := serv.NewServHandler(r, cache)
+	servHandler := server.NewServHandler(r, cache)
 
 	meta := make(map[string]string)
 	meta[consul.KeyHealthURL] = fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.MonitorPort)

@@ -22,7 +22,7 @@ const (
 	CommandGroupCreate  = "chat.group.create"
 	CommandGroupJoin    = "chat.group.join"
 	CommandGroupQuit    = "chat.group.quit"
-	CommandGroupMembers = "chat.group.members"
+	CommandGroupMembers = "chat.group.members" //下面的获取detail已经包括了members
 	CommandGroupDetail  = "chat.group.detail"
 )
 
@@ -50,6 +50,7 @@ const (
 	SNLogin    = "login"  //login
 	SNChat     = "chat"   //chat
 	SNService  = "occult" //rpc service
+	SNRouter   = "router" //router
 )
 
 type ServiceID string
@@ -70,6 +71,7 @@ const (
 	MessageMaxCountPerPage    = 200                 // 同步消息内容时每页的最大数据
 )
 
+// MessageType 消息类型，暂未支持
 const (
 	MessageTypeText  = 1
 	MessageTypeImage = 2

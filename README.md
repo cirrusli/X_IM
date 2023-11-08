@@ -47,8 +47,8 @@ go run main.go [gateway/router/logic/occult]
 │  ├─logic
 │  │  ├─conf
 │  │  ├─handler
-│  │  ├─restful
-│  │  └─serv
+│  │  ├─client
+│  │  └─server
 │  ├─occult
 │  │  ├─conf
 │  │  ├─database

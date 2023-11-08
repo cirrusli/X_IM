@@ -2,17 +2,17 @@ package handler
 
 import (
 	x "X_IM"
-	"X_IM/services/logic/restful"
+	"X_IM/services/logic/client"
 	"X_IM/wire/pkt"
 	"X_IM/wire/rpc"
 	"errors"
 )
 
 type GroupHandler struct {
-	groupService restful.Group
+	groupService client.Group
 }
 
-func NewGroupHandler(groupService restful.Group) *GroupHandler {
+func NewGroupHandler(groupService client.Group) *GroupHandler {
 	return &GroupHandler{
 		groupService: groupService,
 	}
@@ -93,6 +93,7 @@ func (h *GroupHandler) DoQuit(ctx x.Context) {
 	_ = ctx.Resp(pkt.Status_Success, nil)
 }
 
+// DoDetail 获取群基本信息及成员列表
 func (h *GroupHandler) DoDetail(ctx x.Context) {
 	var req pkt.GroupGetReq
 	if err := ctx.ReadBody(&req); err != nil {

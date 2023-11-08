@@ -2,17 +2,17 @@ package handler
 
 import (
 	x "X_IM"
-	"X_IM/services/logic/restful"
+	"X_IM/services/logic/client"
 	"X_IM/wire/pkt"
 	"X_IM/wire/rpc"
 	"errors"
 )
 
 type OfflineHandler struct {
-	msgService restful.Message
+	msgService client.Message
 }
 
-func NewOfflineHandler(message restful.Message) *OfflineHandler {
+func NewOfflineHandler(message client.Message) *OfflineHandler {
 	return &OfflineHandler{
 		msgService: message,
 	}

@@ -7,7 +7,8 @@ PublicPort: 8000
 Tags:
   - IDC:HZ_ALI
 Domain: ws://ximtest.com
-ConsulURL: 8.146.198.70:8500
+#ConsulURL: 8.146.198.70:8500
+ConsulURL: localhost:8500
 AppSecret: ""
 MessageGPool: 5000
 ConnectionGPool: 15000

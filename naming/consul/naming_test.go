@@ -81,11 +81,11 @@ func TestNaming(t *testing.T) {
 
 	_ = nm.Unsubscribe(serviceName)
 
-	//5.find restful
+	//5.find service
 	srvs, err = nm.Find(serviceName, "gateway")
 	assert.Equal(t, 2, len(srvs))
 
-	//6.find restful to verify tag
+	//6.find service to verify tag
 	srvs, _ = nm.Find(serviceName, "tag2")
 	assert.Equal(t, 1, len(srvs))
 	assert.Equal(t, "test_2", srvs[0].ServiceID())
@@ -94,7 +94,7 @@ func TestNaming(t *testing.T) {
 	err = nm.Deregister("test_2")
 	assert.Nil(t, err)
 
-	//8.find restful to verify deregister
+	//8.find service to verify deregister
 	srvs, err = nm.Find(serviceName)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(srvs))

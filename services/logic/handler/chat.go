@@ -2,7 +2,7 @@ package handler
 
 import (
 	x "X_IM"
-	"X_IM/services/logic/restful"
+	"X_IM/services/logic/client"
 	"X_IM/wire/pkt"
 	"X_IM/wire/rpc"
 	"errors"
@@ -12,11 +12,11 @@ import (
 var ErrNoDestination = errors.New("no destination")
 
 type ChatHandler struct {
-	msgService   restful.Message
-	groupService restful.Group
+	msgService   client.Message
+	groupService client.Group
 }
 
-func NewChatHandler(msg restful.Message, group restful.Group) *ChatHandler {
+func NewChatHandler(msg client.Message, group client.Group) *ChatHandler {
 	return &ChatHandler{
 		msgService:   msg,
 		groupService: group,

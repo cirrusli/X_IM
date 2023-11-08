@@ -17,7 +17,7 @@ func NewServer(listen string, service x.ServiceRegistration, options ...x.Server
 }
 
 func (u *Upgrader) Name() string {
-	return "websocket.Server"
+	return "WebSocket.Server"
 }
 
 func (u *Upgrader) Upgrade(rawConn net.Conn, rd *bufio.Reader, wr *bufio.Writer) (x.Conn, error) {
