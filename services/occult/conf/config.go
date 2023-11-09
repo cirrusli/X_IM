@@ -3,8 +3,8 @@ package conf
 import (
 	x "X_IM/pkg"
 	"X_IM/pkg/logger"
-	"encoding/json"
 	"fmt"
+	"github.com/bytedance/sonic"
 	"log"
 	"os"
 	"strconv"
@@ -36,7 +36,7 @@ type Config struct {
 }
 
 func (c Config) String() string {
-	bts, _ := json.Marshal(c)
+	bts, _ := sonic.Marshal(c)
 	return string(bts)
 }
 

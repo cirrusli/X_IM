@@ -2,7 +2,7 @@ package conf
 
 import (
 	"X_IM/pkg/logger"
-	"encoding/json"
+	"github.com/bytedance/sonic"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -21,7 +21,7 @@ type Config struct {
 }
 
 func (c Config) String() string {
-	bts, _ := json.Marshal(c)
+	bts, _ := sonic.Marshal(c)
 	return string(bts)
 }
 
