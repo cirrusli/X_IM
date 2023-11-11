@@ -99,6 +99,8 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 }
 
 // Receive default listener
+// 如果是心跳包，直接在网关处理即可
+// 逻辑包则通过容器转发到逻辑服务处理
 func (h *Handler) Receive(ag x.Agent, payload []byte) {
 	buf := bytes.NewBuffer(payload)
 	packet, err := pkt.Read(buf)
@@ -138,9 +140,9 @@ func (h *Handler) Receive(ag x.Agent, payload []byte) {
 	}
 }
 
-// Disconnect 登出的逻辑SDK不需要发送协议包，正常断开连接或者心跳超时等情况时网关就会发出连接断开通知
+// Disconnect 登出的逻辑，SDK不需要发送协议包，正常断开连接或者心跳超时等情况时网关就会发出连接断开通知
 func (h *Handler) Disconnect(id string) error {
-	log.Infof("disconnect %s", id)
+	log.Infof("disconnect id: %s", id)
 
 	logout := pkt.New(common.CommandLoginSignOut, pkt.WithChannel(id))
 	err := container.Forward(common.SNLogin, logout)

@@ -31,6 +31,8 @@ const (
 	routePath = "./gateway/route.json"
 	protocol  = "ws" //如果没有在命令行指定的话，就用这个默认值
 	logPath   = "./data/gateway.log"
+
+	ReadWait = 2 * time.Minute
 )
 
 // NewServerStartCmd creates a new http logic server command
@@ -88,7 +90,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		srv = tcp.NewServer(config.Listen, service, srvOpts...)
 	}
 
-	srv.SetReadWait(time.Minute * 2)
+	srv.SetReadWait(ReadWait)
 	srv.SetAcceptor(handler)
 	srv.SetMessageListener(handler)
 	srv.SetStateListener(handler)

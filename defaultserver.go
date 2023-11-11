@@ -103,7 +103,7 @@ func (s *DefaultServer) Start() error {
 	if err != nil {
 		return err
 	}
-	// 采用协程池来增加复用
+	// 采用协程池来复用，避免频繁地创建和销毁协程，减少内存分配和垃圾回收的开销
 	mgpool, _ := ants.NewPool(s.options.MessageGPool, ants.WithPreAlloc(true))
 	defer func() {
 		mgpool.Release()

@@ -23,9 +23,10 @@ type Options struct {
 	LogLevel      string
 }
 
-func init() {
-	std.SetReportCaller(true)
-}
+//func init() {
+// 经常直接调用logger.Info()，导致日志输出的文件名和行号不正确
+//	std.SetReportCaller(true)
+//}
 
 // WithRotationCount set rotation count of log files
 func WithRotationCount(v int) Option {

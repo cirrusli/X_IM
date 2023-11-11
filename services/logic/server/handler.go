@@ -22,13 +22,13 @@ type Handler struct {
 	r *x.Router
 	//Redis中的会话管理
 	cache      x.SessionStorage
-	dispatcher *ServerDispatcher
+	dispatcher *SvrDispatcher
 }
 
 func NewServHandler(r *x.Router, cache x.SessionStorage) *Handler {
 	return &Handler{
 		r:          r,
-		dispatcher: &ServerDispatcher{},
+		dispatcher: &SvrDispatcher{},
 		cache:      cache,
 	}
 }
@@ -96,12 +96,12 @@ func RespErr(agent x.Agent, p *pkt.LogicPkt, status pkt.Status) error {
 	return container.Push(agent.ID(), packet)
 }
 
-type ServerDispatcher struct {
+type SvrDispatcher struct {
 }
 
 // Push 把多个channels数组合并成一个string
 // 设置到消息包LogicPkt的Meta附加信息中，再传输给网关。
-func (d *ServerDispatcher) Push(gateway string, channels []string, p *pkt.LogicPkt) error {
+func (d *SvrDispatcher) Push(gateway string, channels []string, p *pkt.LogicPkt) error {
 	p.AddStringMeta(common.MetaDestChannels, strings.Join(channels, ","))
 	return container.Push(gateway, p)
 }

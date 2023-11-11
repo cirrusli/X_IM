@@ -4,18 +4,18 @@ import (
 	"X_IM/naming"
 	"X_IM/naming/consul"
 	log "X_IM/pkg/logger"
-	"X_IM/services/occult/handler"
-	"github.com/kataras/iris/v12/middleware/accesslog"
-	"github.com/spf13/cobra"
-
+	"X_IM/pkg/middleware"
 	"X_IM/services/occult/conf"
 	"X_IM/services/occult/database"
+	"X_IM/services/occult/handler"
 	"X_IM/wire/common"
 	"context"
 	"fmt"
-	"hash/crc32"
-
+	"github.com/kataras/iris/v12/middleware/accesslog"
+	"github.com/spf13/cobra"
 	"gorm.io/gorm"
+	"hash/crc32"
+	"net/http"
 
 	"github.com/kataras/iris/v12"
 )
@@ -26,6 +26,13 @@ type ServerStartOptions struct {
 
 func newApp(serviceHandler *handler.ServiceHandler) *iris.Application {
 	app := iris.Default()
+	limiter := middleware.NewRateLimiter(middleware.SlidingWindow, 5, 5)
+	app.Use(func(ctx iris.Context) {
+		h := limiter.Limit(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx.Next()
+		}))
+		h.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
+	})
 
 	app.Get("/health", func(ctx iris.Context) {
 		_, _ = ctx.WriteString("ok")
