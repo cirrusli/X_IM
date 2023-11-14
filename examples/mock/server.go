@@ -2,10 +2,10 @@ package mock
 
 import (
 	x "X_IM"
-	"X_IM/naming"
 	"X_IM/pkg/logger"
-	"X_IM/tcp"
-	"X_IM/websocket"
+	"X_IM/pkg/naming"
+	"X_IM/pkg/tcp"
+	"X_IM/pkg/websocket"
 	"errors"
 	"net/http"
 	_ "net/http/pprof"

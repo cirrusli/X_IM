@@ -4,8 +4,8 @@ import (
 	x "X_IM"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/token"
-	"X_IM/wire/common"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/wire/common"
+	pkt2 "X_IM/pkg/wire/pkt"
 	"bytes"
 	"context"
 	"fmt"
@@ -39,10 +39,10 @@ func (d *ClientDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 		return nil, err
 	}
 	// 3. 发送一条CommandLoginSignIn消息
-	loginReq := pkt.New(common.CommandLoginSignIn).WriteBody(&pkt.LoginReq{
+	loginReq := pkt2.New(common.CommandLoginSignIn).WriteBody(&pkt2.LoginReq{
 		Token: tk,
 	})
-	err = wsutil.WriteClientBinary(conn, pkt.Marshal(loginReq))
+	err = wsutil.WriteClientBinary(conn, pkt2.Marshal(loginReq))
 	if err != nil {
 		return nil, err
 	}
@@ -54,15 +54,15 @@ func (d *ClientDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	ack, err := pkt.MustReadLogicPkt(bytes.NewBuffer(frame.Payload))
+	ack, err := pkt2.MustReadLogicPkt(bytes.NewBuffer(frame.Payload))
 	if err != nil {
 		return nil, err
 	}
 	// 4. 判断是否登录成功
-	if ack.Status != pkt.Status_Success {
+	if ack.Status != pkt2.Status_Success {
 		return nil, fmt.Errorf("login failed: %v", &ack.Header)
 	}
-	var resp = new(pkt.LoginResp)
+	var resp = new(pkt2.LoginResp)
 	_ = ack.ReadBody(resp)
 
 	logger.Debug("logined ", resp.GetChannelID())

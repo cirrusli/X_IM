@@ -3,8 +3,8 @@ package mock
 import (
 	x "X_IM"
 	"X_IM/pkg/logger"
-	"X_IM/tcp"
-	"X_IM/websocket"
+	tcp2 "X_IM/pkg/tcp"
+	"X_IM/pkg/websocket"
 	"context"
 	"net"
 	"time"
@@ -28,7 +28,7 @@ func (c *ClientDemo) Start(userID, protocol, addr string) {
 		// set dialer
 		cli.SetDialer(&WebsocketDialer{})
 	} else if protocol == "tcp" {
-		cli = tcp.NewClient("test1", "client", tcp.ClientOptions{})
+		cli = tcp2.NewClient("test1", "client", tcp2.ClientOptions{})
 		cli.SetDialer(&TCPDialer{})
 	}
 
@@ -102,7 +102,7 @@ func (d *TCPDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 		return nil, err
 	}
 	// 2. 发送用户认证信息，示例就是userid
-	err = tcp.WriteFrame(conn, x.OpBinary, []byte(ctx.ID))
+	err = tcp2.WriteFrame(conn, x.OpBinary, []byte(ctx.ID))
 	if err != nil {
 		return nil, err
 	}
