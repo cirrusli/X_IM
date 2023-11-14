@@ -2,9 +2,9 @@ package serv
 
 import (
 	x "X_IM"
-	"X_IM/naming"
-	"X_IM/wire/common"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/naming"
+	"X_IM/pkg/wire/common"
+	pkt2 "X_IM/pkg/wire/pkt"
 	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -42,7 +42,7 @@ func TestSelectorLookup(t *testing.T) {
 	rs, err := NewRouteSelector("../route.json")
 	assert.Nil(t, err)
 
-	packet := pkt.New(common.CommandChatUserTalk, pkt.WithChannel(ksuid.New().String()))
+	packet := pkt2.New(common.CommandChatUserTalk, pkt2.WithChannel(ksuid.New().String()))
 	packet.AddStringMeta(MetaKeyApp, "x_im")
 	packet.AddStringMeta(MetaKeyAccount, "test1")
 	hit := rs.Lookup(&packet.Header, srvs)
@@ -50,16 +50,16 @@ func TestSelectorLookup(t *testing.T) {
 
 	hits := make(map[string]int)
 	for i := 0; i < 100; i++ {
-		header := pkt.Header{
+		header := pkt2.Header{
 			ChannelID: ksuid.New().String(),
-			Meta: []*pkt.Meta{
+			Meta: []*pkt2.Meta{
 				{
-					Type:  pkt.MetaType_string,
+					Type:  pkt2.MetaType_string,
 					Key:   MetaKeyApp,
 					Value: ksuid.New().String(),
 				},
 				{
-					Type:  pkt.MetaType_string,
+					Type:  pkt2.MetaType_string,
 					Key:   MetaKeyAccount,
 					Value: ksuid.New().String(),
 				},

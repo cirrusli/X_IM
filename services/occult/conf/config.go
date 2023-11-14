@@ -1,10 +1,11 @@
 package conf
 
 import (
-	x "X_IM/pkg"
+	"X_IM/pkg"
 	"X_IM/pkg/logger"
 	"fmt"
 	"github.com/bytedance/sonic"
+	"github.com/kelseyhightower/envconfig"
 	"log"
 	"os"
 	"strconv"
@@ -13,8 +14,6 @@ import (
 
 	"github.com/go-redis/redis/v7"
 	"github.com/kataras/iris/v12/middleware/accesslog"
-	"github.com/kelseyhightower/envconfig"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -46,6 +45,14 @@ func Init(file string) (*Config, error) {
 	viper.AddConfigPath("/etc/conf")
 
 	var config Config
+	// 之前envconfig放在viper解析后如果字段(如LogLevel)从配置文件中读取,
+	// 由于有default标签,会覆盖配置文件中的值
+	// 需要envconfig是因为配置文件中没有的字段(如Driver),可以直接用结构体字段的default
+	err := envconfig.Process("x_im", &config)
+	if err != nil {
+		return nil, err
+	}
+	logger.Infoln("envconfig: ", config)
 	if err := viper.ReadInConfig(); err != nil {
 		logger.Warn(err)
 	} else {
@@ -53,12 +60,10 @@ func Init(file string) (*Config, error) {
 			return nil, err
 		}
 	}
-	err := envconfig.Process("x_im", &config)
-	if err != nil {
-		return nil, err
-	}
+	logger.Infoln("viper: ", config)
+
 	if config.ServiceID == "" {
-		localIP := x.GetLocalIP()
+		localIP := pkg.GetLocalIP()
 		config.ServiceID = fmt.Sprintf("occult_%s", strings.ReplaceAll(localIP, ".", ""))
 		arr := strings.Split(localIP, ".")
 		if len(arr) == 4 {
@@ -67,9 +72,9 @@ func Init(file string) (*Config, error) {
 		}
 	}
 	if config.PublicAddress == "" {
-		config.PublicAddress = x.GetLocalIP()
+		config.PublicAddress = pkg.GetLocalIP()
 	}
-	logger.Info(config)
+	logger.Info("last: ", config)
 	return &config, nil
 }
 

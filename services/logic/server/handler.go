@@ -2,10 +2,10 @@ package server
 
 import (
 	x "X_IM"
-	"X_IM/container"
+	"X_IM/pkg/container"
 	"X_IM/pkg/logger"
-	"X_IM/wire/common"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/wire/common"
+	"X_IM/pkg/wire/pkt"
 	"bytes"
 	"errors"
 	"google.golang.org/protobuf/proto"

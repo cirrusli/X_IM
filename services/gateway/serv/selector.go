@@ -3,8 +3,8 @@ package serv
 import (
 	x "X_IM"
 	"X_IM/pkg/logger"
+	"X_IM/pkg/wire/pkt"
 	"X_IM/services/gateway/conf"
-	"X_IM/wire/pkt"
 	"hash/crc32"
 	"math/rand"
 )

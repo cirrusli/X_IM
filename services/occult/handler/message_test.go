@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"X_IM/pkg/wire/rpc"
 	"X_IM/services/occult/database"
-	"X_IM/wire/rpc"
 	"fmt"
 	"testing"
 	"time"

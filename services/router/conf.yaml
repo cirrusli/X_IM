@@ -4,6 +4,6 @@ PublicAddress: localhost # consul health check needed
 PublicPort: 8100 #just in HTTP server's port
 Tags:
   - router
-LogLevel: INFO
+LogLevel: DEBUG
 #ConsulURL: 8.146.198.70:8500
 ConsulURL: localhost:8500

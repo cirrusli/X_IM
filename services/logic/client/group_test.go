@@ -1,7 +1,7 @@
 package client
 
 import (
-	"X_IM/wire/rpc"
+	"X_IM/pkg/wire/rpc"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

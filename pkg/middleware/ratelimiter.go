@@ -87,13 +87,13 @@ func (rl *TokenBucketRateLimiter) Limit(next http.Handler) http.Handler {
 }
 
 func (rl *SlidingWindowRateLimiter) Limit(next http.Handler) http.Handler {
-	logger.Info("进入限流检测")
+	logger.Debugln("进入限流检测")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rl.mu.Lock()
 		defer rl.mu.Unlock()
 		// 查看当前请求的ip是否已有记录
 		v, exists := rl.visitors[r.RemoteAddr]
-		logger.Infof("Remote IP is: %s", r.RemoteAddr)
+		logger.Debugln("Remote IP is: %s", r.RemoteAddr)
 		if !exists {
 			v = &visitor{
 				timestamps: make([]time.Time, 0),

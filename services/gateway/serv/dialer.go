@@ -3,8 +3,8 @@ package serv
 import (
 	x "X_IM"
 	"X_IM/pkg/logger"
-	"X_IM/tcp"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/tcp"
+	"X_IM/pkg/wire/pkt"
 	"google.golang.org/protobuf/proto"
 	"net"
 )

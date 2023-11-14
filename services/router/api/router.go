@@ -2,11 +2,11 @@ package api
 
 import (
 	x "X_IM"
-	"X_IM/naming"
 	"X_IM/pkg"
+	"X_IM/pkg/naming"
+	"X_IM/pkg/wire/common"
 	"X_IM/services/router/conf"
 	"X_IM/services/router/ip"
-	"X_IM/wire/common"
 	"fmt"
 	"hash/crc32"
 	"log"

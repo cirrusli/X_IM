@@ -2,7 +2,7 @@ package api
 
 import (
 	x "X_IM"
-	"X_IM/naming"
+	"X_IM/pkg/naming"
 	"X_IM/services/router/conf"
 	"github.com/stretchr/testify/assert"
 	"testing"

@@ -2,15 +2,15 @@ package gateway
 
 import (
 	x "X_IM"
-	"X_IM/container"
-	"X_IM/naming"
-	"X_IM/naming/consul"
+	"X_IM/pkg/container"
 	"X_IM/pkg/logger"
+	"X_IM/pkg/naming"
+	"X_IM/pkg/naming/consul"
+	"X_IM/pkg/tcp"
+	"X_IM/pkg/websocket"
+	"X_IM/pkg/wire/common"
 	"X_IM/services/gateway/conf"
 	"X_IM/services/gateway/serv"
-	"X_IM/tcp"
-	"X_IM/websocket"
-	"X_IM/wire/common"
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
@@ -26,8 +26,8 @@ type StartOptions struct {
 }
 
 const (
-	confWS    = "./gateway/conf.yaml"
-	confTCP   = "./gateway/conf2.yaml"
+	confWS    = "./gateway/ws.yaml"
+	confTCP   = "./gateway/tcp.yaml"
 	routePath = "./gateway/route.json"
 	protocol  = "ws" //如果没有在命令行指定的话，就用这个默认值
 	logPath   = "./data/gateway.log"

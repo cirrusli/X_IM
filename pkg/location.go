@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"X_IM/wire/endian"
+	"X_IM/pkg/wire/endian"
 	"bytes"
 	"errors"
 )

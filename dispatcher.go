@@ -1,6 +1,8 @@
 package X_IM
 
-import "X_IM/wire/pkt"
+import (
+	"X_IM/pkg/wire/pkt"
+)
 
 // Dispatcher 将消息分派到网关的组件
 // 向gateway中的channels两个连接推送一条LogicPkt消息。这个能力是容器提供的

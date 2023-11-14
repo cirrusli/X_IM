@@ -1,0 +1,14 @@
+ServiceID: gate02
+ServiceName: tgateway #TCP gateway
+Listen: ":8002"
+MonitorPort: 8003
+PublicAddress: localhost # consul health check needed
+PublicPort: 8002
+Tags:
+  - IDC:BJ_ALI
+Domain: ws://ximtest.com
+#ConsulURL: 8.146.198.70:8500
+ConsulURL: localhost:8500
+AppSecret: ""
+MessageGPool: 5000
+ConnectionGPool: 15000

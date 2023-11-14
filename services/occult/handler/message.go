@@ -1,20 +1,22 @@
 package handler
 
 import (
+	"X_IM/pkg/wire/common"
+	"X_IM/pkg/wire/rpc"
 	"X_IM/services/occult/database"
-	"X_IM/wire/common"
-	"X_IM/wire/rpc"
 	"github.com/go-redis/redis/v7"
 	"github.com/kataras/iris/v12"
+	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 	"time"
 )
 
 type ServiceHandler struct {
-	BaseDB    *gorm.DB
-	MessageDB *gorm.DB
-	Cache     *redis.Client
-	IDGen     *database.IDGenerator
+	BaseDB            *gorm.DB
+	MessageDB         *gorm.DB
+	Cache             *redis.Client
+	IDGen             *database.IDGenerator
+	groupSingleflight singleflight.Group
 }
 
 func (h *ServiceHandler) InsertUserMessage(c iris.Context) {

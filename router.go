@@ -1,7 +1,7 @@
 package X_IM
 
 import (
-	"X_IM/wire/pkt"
+	"X_IM/pkg/wire/pkt"
 	"fmt"
 	"sync"
 )

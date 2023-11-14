@@ -1,13 +1,13 @@
 package router
 
 import (
-	"X_IM/naming"
-	"X_IM/naming/consul"
 	"X_IM/pkg/logger"
+	"X_IM/pkg/naming"
+	"X_IM/pkg/naming/consul"
+	"X_IM/pkg/wire/common"
 	"X_IM/services/router/api"
 	"X_IM/services/router/conf"
 	"X_IM/services/router/ip"
-	"X_IM/wire/common"
 	"context"
 	"fmt"
 	"github.com/prometheus/common/log"

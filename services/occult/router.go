@@ -1,14 +1,14 @@
 package occult
 
 import (
-	"X_IM/naming"
-	"X_IM/naming/consul"
 	log "X_IM/pkg/logger"
 	"X_IM/pkg/middleware"
+	"X_IM/pkg/naming"
+	"X_IM/pkg/naming/consul"
+	"X_IM/pkg/wire/common"
 	"X_IM/services/occult/conf"
 	"X_IM/services/occult/database"
 	"X_IM/services/occult/handler"
-	"X_IM/wire/common"
 	"context"
 	"fmt"
 	"github.com/kataras/iris/v12/middleware/accesslog"
@@ -20,12 +20,18 @@ import (
 	"github.com/kataras/iris/v12"
 )
 
+const (
+	confPath = "./occult/conf.yaml"
+	logPath  = "./data/occult.log"
+)
+
 type ServerStartOptions struct {
 	config string
 }
 
 func newApp(serviceHandler *handler.ServiceHandler) *iris.Application {
 	app := iris.Default()
+	// 限流
 	limiter := middleware.NewRateLimiter(middleware.SlidingWindow, 5, 5)
 	app.Use(func(ctx iris.Context) {
 		h := limiter.Limit(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +79,7 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 			return RunServerStart(ctx, opts, version)
 		},
 	}
-	cmd.PersistentFlags().StringVarP(&opts.config, "config", "c", "./occult/conf.yaml", "Config file")
+	cmd.PersistentFlags().StringVarP(&opts.config, "config", "c", confPath, "Config file")
 	return cmd
 }
 
@@ -85,7 +91,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	}
 	_ = log.Init(log.Settings{
 		Level:    config.LogLevel,
-		Filename: "./data/occult.log",
+		Filename: logPath,
 	})
 
 	// database.Init

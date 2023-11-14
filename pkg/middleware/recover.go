@@ -3,7 +3,7 @@ package middleware
 import (
 	x "X_IM"
 	"X_IM/pkg/logger"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/wire/pkt"
 	"fmt"
 	"runtime"
 	"strings"

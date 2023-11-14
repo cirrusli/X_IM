@@ -10,3 +10,4 @@ RedisAddrs: 8.146.198.70:6379
 RedisPass: Redis:0617
 BaseDB: root:lzq@tcp(8.146.198.70:3306)/x_base?charset=utf8mb4&parseTime=True&loc=Local
 MessageDB: root:lzq@tcp(8.146.198.70:3306)/x_message?charset=utf8mb4&parseTime=True&loc=Local
+LogLevel: DEBUG

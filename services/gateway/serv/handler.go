@@ -2,11 +2,11 @@ package serv
 
 import (
 	x "X_IM"
-	"X_IM/container"
+	"X_IM/pkg/container"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/token"
-	"X_IM/wire/common"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/wire/common"
+	"X_IM/pkg/wire/pkt"
 	"bytes"
 	"fmt"
 	"regexp"
@@ -40,9 +40,10 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 	buf := bytes.NewBuffer(frame.GetPayload())
 	req, err := pkt.MustReadLogicPkt(buf)
 	if err != nil {
-		log.Error(err)
+		log.Error("in Accept(): ", err)
 		return "", nil, err
 	}
+
 	// 2. 必须是登录包
 	if req.Command != common.CommandLoginSignIn {
 		resp := pkt.NewFrom(&req.Header)

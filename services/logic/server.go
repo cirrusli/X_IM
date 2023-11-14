@@ -2,23 +2,30 @@ package logic
 
 import (
 	x "X_IM"
-	"X_IM/container"
-	"X_IM/naming"
-	"X_IM/naming/consul"
+	"X_IM/pkg/container"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/middleware"
+	"X_IM/pkg/naming"
+	"X_IM/pkg/naming/consul"
+	"X_IM/pkg/storage"
+	"X_IM/pkg/tcp"
+	"X_IM/pkg/wire/common"
 	"X_IM/services/logic/client"
 	"X_IM/services/logic/conf"
 	"X_IM/services/logic/handler"
 	"X_IM/services/logic/server"
-	"X_IM/storage"
-	"X_IM/tcp"
-	"X_IM/wire/common"
 	"context"
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
 	"strings"
+)
+
+const (
+	//启动不同server时,注意service name也需要一起更改
+	confChat  = "./logic/chat.yaml"
+	confLogin = "./logic/login.yaml"
+	logPath   = "./data/server.log"
 )
 
 type StartOptions struct {
@@ -38,10 +45,10 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 		},
 	}
 	cmd.PersistentFlags().StringVarP(&opts.config,
-		"config", "c", "./logic/conf.yaml", "Config file")
+		"config", "c", confLogin, "Config file")
 
 	cmd.PersistentFlags().StringVarP(&opts.serviceName,
-		"serviceName", "s", "chat", "defined a service name,option is login or chat")
+		"serviceName", "s", common.SNLogin, "defined a service name,option is login or chat")
 
 	return cmd
 }
@@ -54,7 +61,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 	}
 	_ = logger.Init(logger.Settings{
 		Level:    config.LogLevel,
-		Filename: "./data/server.log",
+		Filename: logPath,
 	})
 
 	var groupService client.Group

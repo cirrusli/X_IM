@@ -2,7 +2,7 @@ package X_IM
 
 import (
 	"X_IM/pkg"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/wire/pkt"
 	"errors"
 )
 

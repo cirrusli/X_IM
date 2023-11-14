@@ -3,8 +3,8 @@ package X_IM
 import (
 	"X_IM/pkg"
 	"X_IM/pkg/logger"
-	"X_IM/wire/common"
-	"X_IM/wire/pkt"
+	"X_IM/pkg/wire/common"
+	"X_IM/pkg/wire/pkt"
 	"google.golang.org/protobuf/proto"
 	"sync"
 )

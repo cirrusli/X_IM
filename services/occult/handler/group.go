@@ -1,8 +1,9 @@
 package handler
 
 import (
+	"X_IM/pkg/logger"
+	"X_IM/pkg/wire/rpc"
 	"X_IM/services/occult/database"
-	"X_IM/wire/rpc"
 	"errors"
 	"github.com/bwmarrin/snowflake"
 	"github.com/kataras/iris/v12"
@@ -138,26 +139,36 @@ func (h *ServiceHandler) GroupMembers(c iris.Context) {
 func (h *ServiceHandler) GroupGet(c iris.Context) {
 	groupID := c.Params().Get("id")
 	if groupID == "" {
-		c.StopWithError(iris.StatusBadRequest, errors.New("group is null"))
+		c.StopWithError(iris.StatusBadRequest, errors.New("no group id"))
 		return
 	}
-	id, err := h.IDGen.ParseBase36(groupID)
-	if err != nil {
-		c.StopWithError(iris.StatusBadRequest, errors.New("group is invalid:"+groupID))
-		return
-	}
-	var group database.Group
-	err = h.BaseDB.First(&group, id.Int64()).Error
+
+	result, err, _ := h.groupSingleflight.Do(groupID, func() (interface{}, error) {
+		id, err := h.IDGen.ParseBase36(groupID)
+		if err != nil {
+			return nil, errors.New("group is invalid:" + groupID)
+		}
+		var group database.Group
+		logger.Debugln("Starting database query for group:", groupID)
+		err = h.BaseDB.First(&group, id.Int64()).Error
+		logger.Debugln("Finished database query for group:", groupID)
+		if err != nil {
+			return nil, err
+		}
+		return &rpc.GetGroupResp{
+			ID:           groupID,
+			Name:         group.Name,
+			Avatar:       group.Avatar,
+			Introduction: group.Introduction,
+			Owner:        group.Owner,
+			CreatedAt:    group.CreatedAt.Unix(),
+		}, nil
+	})
+
 	if err != nil {
 		c.StopWithError(iris.StatusInternalServerError, err)
 		return
 	}
-	_, _ = c.Negotiate(&rpc.GetGroupResp{
-		ID:           groupID,
-		Name:         group.Name,
-		Avatar:       group.Avatar,
-		Introduction: group.Introduction,
-		Owner:        group.Owner,
-		CreatedAt:    group.CreatedAt.Unix(),
-	})
+
+	_, _ = c.Negotiate(result)
 }

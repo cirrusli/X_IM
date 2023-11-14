@@ -1,7 +1,7 @@
 package client
 
 import (
-	"X_IM/wire/rpc"
+	"X_IM/pkg/wire/rpc"
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
