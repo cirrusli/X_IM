@@ -20,6 +20,6 @@
 # Go workspace file
 go.work
 # others
-/README_en.md
+/docs/README_en.md
 *.log
 /docs/

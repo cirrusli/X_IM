@@ -19,7 +19,7 @@ docker-compose -f "docker-compose.yml" up -d --build
 Gateway、Router、Logic、Occult
     
 ```bash
-cd services
+cd internal
 go run main.go [gateway/router/logic/occult]
 ```
 ### 项目目录结构
@@ -39,7 +39,7 @@ go run main.go [gateway/router/logic/occult]
 │  ├─logger
 │  ├─middleware
 │  └─token
-├─services
+├─internal
 │  ├─data
 │  ├─gateway
 │  │  ├─conf
