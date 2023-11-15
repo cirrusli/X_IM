@@ -25,29 +25,26 @@ go run main.go [gateway/router/logic/occult]
 ### 项目目录结构
 
 ```bash
-├─assets
+│─assets
 │  └─data
-├─container
+├─cmd
+├─docs
 ├─examples
 │  ├─benchmark
-│  ├─dialer
 │  ├─mock
+│  │  └─dialer
 │  └─ut
-├─naming
-│  └─consul
-├─pkg
-│  ├─logger
-│  ├─middleware
-│  └─token
+│      ├─gateway
+│      └─logic
 ├─internal
 │  ├─data
 │  ├─gateway
 │  │  ├─conf
 │  │  └─serv
 │  ├─logic
+│  │  ├─client
 │  │  ├─conf
 │  │  ├─handler
-│  │  ├─client
 │  │  └─server
 │  ├─occult
 │  │  ├─conf
@@ -58,14 +55,23 @@ go run main.go [gateway/router/logic/occult]
 │      ├─conf
 │      ├─data
 │      └─ip
-├─storage
-├─tcp
-├─websocket
-└─wire
-    ├─common
-    ├─endian
-    ├─pkt
-    ├─protofiles
-    └─rpc
+├─pkg
+│  ├─container
+│  ├─kafka
+│  ├─logger
+│  ├─middleware
+│  ├─naming
+│  │  └─consul
+│  ├─storage
+│  ├─tcp
+│  ├─token
+│  ├─websocket
+│  └─wire
+│      ├─common
+│      ├─endian
+│      ├─pkt
+│      ├─protofiles
+│      └─rpc
+└─scripts
 
 ```
