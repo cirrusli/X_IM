@@ -1,4 +1,4 @@
-package ut
+package logic
 
 import (
 	"X_IM/examples/dialer"
