@@ -93,7 +93,7 @@ func (rl *SlidingWindowRateLimiter) Limit(next http.Handler) http.Handler {
 		defer rl.mu.Unlock()
 		// 查看当前请求的ip是否已有记录
 		v, exists := rl.visitors[r.RemoteAddr]
-		logger.Debugln("Remote IP is: %s", r.RemoteAddr)
+		logger.Infof("Remote IP is: %s", r.RemoteAddr)
 		if !exists {
 			v = &visitor{
 				timestamps: make([]time.Time, 0),

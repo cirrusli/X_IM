@@ -3,6 +3,7 @@ module X_IM
 go 1.21
 
 require (
+	github.com/Chain-Zhang/pinyin v0.1.3
 	github.com/Shopify/sarama v1.29.0
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/bytedance/sonic v1.10.2
