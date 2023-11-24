@@ -1,14 +1,15 @@
 ServiceID: gate01
 ServiceName: wgateway
 Listen: ":8000"
+# Prometheus and Consul's port
 MonitorPort: 8001
-PublicAddress: localhost # consul health check needed
+PublicAddress: 20.115.1.240 # consul health check needed
 PublicPort: 8000
 Tags:
   - IDC:HZ_ALI
 Domain: ws://ximtest.com
-#ConsulURL: 8.146.198.70:8500
-ConsulURL: localhost:8500
+ConsulURL: 8.146.198.70:8500
+#ConsulURL: localhost:8500
 AppSecret: ""
 MessageGPool: 5000
 ConnectionGPool: 15000

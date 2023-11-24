@@ -2,7 +2,6 @@ package serv
 
 import (
 	x "X_IM"
-	"X_IM/pkg/logger"
 	"X_IM/pkg/tcp"
 	"X_IM/pkg/wire/pkt"
 	"google.golang.org/protobuf/proto"
@@ -27,7 +26,7 @@ func (d *TCPDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 	req := &pkt.InnerHandshakeReq{
 		ServiceID: d.ServiceID,
 	}
-	logger.Infof("send req: %+v", req)
+	log.Infof("in DialAndHandshake(): send req: %+v", req)
 	//2.将自己的ServiceID发送给连接方
 	bts, _ := proto.Marshal(req)
 	err = tcp.WriteFrame(conn, x.OpBinary, bts)

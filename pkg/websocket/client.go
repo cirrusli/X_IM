@@ -52,13 +52,13 @@ func NewClientWithProps(id, name string, meta map[string]string, opts ClientOpti
 		options: opts,
 		Meta:    meta,
 	}
-	logger.Infoln("in websocket/client.go:NewClientWithProps():succeed.")
+	fmt.Println("in websocket/client.go:NewClientWithProps():succeed.")
 	return cli
 }
 
 // Connect to logic
 func (c *Client) Connect(addr string) error {
-	logger.Infoln("in websocket/client.go:Connect():arrived here.")
+	fmt.Println("in websocket/client.go:Connect():arrived here.")
 
 	_, err := url.Parse(addr)
 	if err != nil {

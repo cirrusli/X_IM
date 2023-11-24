@@ -26,10 +26,10 @@ type StartOptions struct {
 }
 
 const (
-	confWS    = "./gateway/ws.yaml"
-	confTCP   = "./gateway/tcp.yaml"
-	routePath = "./gateway/route.json"
-	protocol  = "ws" //如果没有在命令行指定的话，就用这个默认值
+	confWS    = "../internal/gateway/ws.yaml"
+	confTCP   = "../internal/gateway/tcp.yaml"
+	routePath = "../internal/gateway/route.json"
+	protocol  = "ws" //如果没有在命令行指定，就用这个默认值
 	logPath   = "./data/gateway.log"
 
 	ReadWait = 2 * time.Minute
@@ -69,6 +69,8 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 	}
 	meta := make(map[string]string)
 	meta[consul.KeyHealthURL] = fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.MonitorPort)
+	logger.Infoln("consul health URL is: ",
+		fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.MonitorPort))
 	meta["domain"] = config.Domain
 
 	var srv x.Server
@@ -82,7 +84,8 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		Meta:     meta,
 	}
 	srvOpts := []x.ServerOption{
-		x.WithConnectionGPool(config.ConnectionGPool), x.WithMessageGPool(config.MessageGPool),
+		x.WithConnectionGPool(config.ConnectionGPool),
+		x.WithMessageGPool(config.MessageGPool),
 	}
 	if opts.protocol == "ws" {
 		srv = websocket.NewServer(config.Listen, service, srvOpts...)
@@ -95,7 +98,8 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 	srv.SetMessageListener(handler)
 	srv.SetStateListener(handler)
 
-	_ = container.Init(srv, common.SNChat, common.SNLogin)
+	//todo: _ = container.Init(srv, common.SNChat, common.SNLogin)
+	_ = container.Init(srv, common.SNChat)
 	container.EnableMonitor(fmt.Sprintf(":%d", config.MonitorPort))
 
 	ns, err := consul.NewNaming(config.ConsulURL)

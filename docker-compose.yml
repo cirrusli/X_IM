@@ -19,6 +19,7 @@ services:
       - ~/data/mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: lzq
+
   redis:
     image: docker.io/library/redis:6.2
     container_name: x_redis
@@ -30,6 +31,7 @@ services:
     volumes:
       - ~/data/redis:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
+
   consul:
     image: docker.io/library/consul:1.15
     container_name: x_consul
@@ -65,6 +67,13 @@ services:
     depends_on:
       - zookeeper
 
+  prometheus:
+    image: quay.io/prometheus/prometheus
+    container_name: prometheus
+    volumes:
+      - ~/data/prometheus:/etc/prometheus
+    ports:
+      - "9090:9090"
 
 networks:
   xnet: {}

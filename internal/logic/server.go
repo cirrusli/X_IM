@@ -23,8 +23,8 @@ import (
 
 const (
 	//启动不同server时,注意service name也需要一起更改
-	confChat  = "./logic/chat.yaml"
-	confLogin = "./logic/login.yaml"
+	confChat  = "../internal/logic/chat.yaml"
+	confLogin = "../internal/logic/login.yaml"
 	logPath   = "./data/server.log"
 )
 
@@ -45,10 +45,10 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 		},
 	}
 	cmd.PersistentFlags().StringVarP(&opts.config,
-		"config", "c", confLogin, "Config file")
+		"config", "c", confChat, "Config file")
 
 	cmd.PersistentFlags().StringVarP(&opts.serviceName,
-		"serviceName", "s", common.SNLogin, "defined a service name,option is login or chat")
+		"serviceName", "s", common.SNChat, "defined a service name,option is login or chat")
 
 	return cmd
 }
@@ -111,6 +111,8 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 
 	meta := make(map[string]string)
 	meta[consul.KeyHealthURL] = fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.MonitorPort)
+	logger.Infoln("consul health URL is: ",
+		fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.MonitorPort))
 	meta["zone"] = config.Zone
 
 	service := &naming.DefaultService{

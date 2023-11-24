@@ -2,7 +2,6 @@ package dialer
 
 import (
 	x "X_IM"
-	"X_IM/pkg/logger"
 	"X_IM/pkg/token"
 	"X_IM/pkg/wire/common"
 	"X_IM/pkg/wire/pkt"
@@ -20,7 +19,7 @@ type ClientDialer struct {
 }
 
 func (d *ClientDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
-	logger.Infoln("in dialer/client.go:DialAndHandshake():arrived here.")
+	fmt.Println("in dialer/client.go:DialAndHandshake():arrived here.")
 	// 1. 拨号
 	conn, _, _, err := ws.Dial(context.TODO(), ctx.Address)
 	if err != nil {
@@ -49,7 +48,7 @@ func (d *ClientDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 
 	// wait resp
 	_ = conn.SetReadDeadline(time.Now().Add(ctx.Timeout))
-	logger.Infoln("in dialer/client.go:DialAndHandshake():doing login_test.go:will read frame.")
+	fmt.Println("in dialer/client.go:DialAndHandshake():doing login_test.go:will read frame.")
 	frame, err := ws.ReadFrame(conn)
 	if err != nil {
 		return nil, err
@@ -65,6 +64,6 @@ func (d *ClientDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
 	var resp = new(pkt.LoginResp)
 	_ = ack.ReadBody(resp)
 
-	logger.Debug("logined ", resp.GetChannelID())
+	fmt.Println("logined ", resp.GetChannelID())
 	return conn, nil
 }

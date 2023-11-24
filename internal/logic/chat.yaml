@@ -1,14 +1,15 @@
 ServiceID: chat01
 Listen: ":8015"
-PublicAddress: localhost # consul health check needed
+PublicAddress: 20.115.1.240 # consul health check needed
+# Prometheus and Consul's port
 MonitorPort: 8016
 PublicPort: 8015
 Tags:
   - logic
   - chat
 Zone: zone_ali_03
-#ConsulURL: 8.146.198.70:8500
-ConsulURL: localhost:8500
+ConsulURL: 8.146.198.70:8500
+#ConsulURL: localhost:8500
 RedisAddrs: 8.146.198.70:6379
 RedisPass: Redis:0617
 #RPC service

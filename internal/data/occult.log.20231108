@@ -1,3 +1,0 @@
-time="2023-11-08T12:13:00+08:00" level=info msg="consul health URL is:  http://localhost:8080/health" func=X_IM/pkg/logger.Infoln file="D:/Gooo/Dev_Projects/X_IM/pkg/logger/logger.go:261"
-time="2023-11-08T12:14:04+08:00" level=info msg="consul health URL is:  http://localhost:8080/health" func=X_IM/pkg/logger.Infoln file="D:/Gooo/Dev_Projects/X_IM/pkg/logger/logger.go:261"
-time="2023-11-08T15:28:20+08:00" level=info msg="consul health URL is:  http://localhost:8080/health" func=X_IM/pkg/logger.Infoln file="D:/Gooo/Dev_Projects/X_IM/pkg/logger/logger.go:261"
