@@ -1,4 +1,4 @@
-package benchmark
+package ut
 
 import (
 	x "X_IM"
@@ -31,7 +31,7 @@ func TestParallel(t *testing.T) {
 				Heartbeat: x.DefaultHeartbeat,
 			})
 			// set dialer
-			cli.SetDialer(&mock.WebsocketDialer{})
+			cli.SetDialer(&mock.WSDialer{})
 
 			// step2: 建立连接
 			err := cli.Connect(wsurl)
@@ -59,7 +59,7 @@ func TestMessage(t *testing.T) {
 		Heartbeat: x.DefaultHeartbeat,
 	})
 	// set dialer
-	cli.SetDialer(&mock.WebsocketDialer{})
+	cli.SetDialer(&mock.WSDialer{})
 
 	// step2: 建立连接
 	err := cli.Connect(wsurl)
@@ -77,7 +77,8 @@ func TestMessage(t *testing.T) {
 	for {
 		frame, err := cli.Read()
 		if err != nil {
-			logger.Info("time", time.Now().UnixNano(), err)
+			logger.Info("time: ", time.Now().UnixNano())
+			t.Error(err)
 			break
 		}
 		if frame.GetOpCode() != x.OpBinary {
@@ -88,6 +89,5 @@ func TestMessage(t *testing.T) {
 			break
 		}
 	}
-
 	t.Logf("message %d cost %v", msgs, time.Since(t0))
 }

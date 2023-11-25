@@ -3,9 +3,10 @@ package mock
 import (
 	x "X_IM"
 	"X_IM/pkg/logger"
-	tcp2 "X_IM/pkg/tcp"
+	"X_IM/pkg/tcp"
 	"X_IM/pkg/websocket"
 	"context"
+	"fmt"
 	"net"
 	"time"
 
@@ -26,9 +27,9 @@ func (c *ClientDemo) Start(userID, protocol, addr string) {
 	if protocol == "ws" {
 		cli = websocket.NewClient(userID, "client", websocket.ClientOptions{})
 		// set dialer
-		cli.SetDialer(&WebsocketDialer{})
+		cli.SetDialer(&WSDialer{})
 	} else if protocol == "tcp" {
-		cli = tcp2.NewClient("test1", "client", tcp2.ClientOptions{})
+		cli = tcp.NewClient("test1", "client", tcp.ClientOptions{})
 		cli.SetDialer(&TCPDialer{})
 	}
 
@@ -71,11 +72,11 @@ func (c *ClientDemo) Start(userID, protocol, addr string) {
 	cli.Close()
 }
 
-type WebsocketDialer struct {
+type WSDialer struct {
 }
 
-func (d *WebsocketDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
-	logger.Infoln("in mock/client.go:DialAndHandshake():websocket dialer")
+func (d *WSDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
+	fmt.Println("in mock/client.go:DialAndHandshake():websocket dialer")
 
 	// 1 调用ws.Dial拨号
 	conn, _, _, err := ws.Dial(context.TODO(), ctx.Address)
@@ -95,14 +96,14 @@ type TCPDialer struct {
 }
 
 func (d *TCPDialer) DialAndHandshake(ctx x.DialerContext) (net.Conn, error) {
-	logger.Infoln("in examples/mock/client.go:DialAndHandshake(): TCPDialer dialing: ", ctx.Address)
+	fmt.Println("in mock/client.go:DialAndHandshake(): TCPDialer dialing: ", ctx.Address)
 	// 1 调用net.Dial拨号
 	conn, err := net.DialTimeout("tcp", ctx.Address, ctx.Timeout)
 	if err != nil {
 		return nil, err
 	}
 	// 2. 发送用户认证信息，示例就是userid
-	err = tcp2.WriteFrame(conn, x.OpBinary, []byte(ctx.ID))
+	err = tcp.WriteFrame(conn, x.OpBinary, []byte(ctx.ID))
 	if err != nil {
 		return nil, err
 	}

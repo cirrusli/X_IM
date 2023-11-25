@@ -1,7 +1,9 @@
 package main
 
 import (
+	"X_IM/examples/benchmark"
 	"X_IM/examples/mock"
+	"X_IM/examples/ut"
 	"X_IM/pkg/logger"
 	"context"
 	"flag"
@@ -14,12 +16,14 @@ func main() {
 	flag.Parse()
 
 	root := &cobra.Command{
-		Use:     "",
+		Use:     "X_IM",
 		Version: version,
-		Short:   "there is mock test",
+		Short:   "test",
 	}
 	ctx := context.Background()
 
+	root.AddCommand(ut.NewEchoCmd(ctx))
+	root.AddCommand(benchmark.NewBenchmarkCmd(ctx))
 	root.AddCommand(mock.NewClientCmd(ctx))
 	root.AddCommand(mock.NewServerCmd(ctx))
 
