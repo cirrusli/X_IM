@@ -188,7 +188,7 @@ func (r *Report) print() {
 	r.printf("\n")
 }
 
-func (r *Report) printf(s string, v ...interface{}) {
+func (r *Report) printf(s string, v ...any) {
 	_, _ = fmt.Fprintf(r.w, s, v...)
 
 }

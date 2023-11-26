@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	confPath = "./occult/conf.yaml"
+	confPath = "../internal/occult/conf.yaml"
 	logPath  = "./data/occult.log"
 )
 

@@ -43,7 +43,7 @@ var tmplFuncMap = template.FuncMap{
 	"jsonify":         jsonify,
 }
 
-func jsonify(v interface{}) string {
+func jsonify(v any) string {
 	d, _ := sonic.Marshal(v)
 	return string(d)
 }

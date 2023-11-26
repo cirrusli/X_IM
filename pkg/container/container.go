@@ -53,7 +53,7 @@ type Container struct {
 var log = logger.WithField("module", "container")
 
 // 一个服务只允许一个容器
-// 使用单例模式初始化Container对象
+// 使用饿汉式单例模式初始化Container对象
 var c = &Container{
 	state:    0,
 	selector: &HashSelector{},
@@ -136,6 +136,7 @@ func Push(server string, p *pkt.LogicPkt) error {
 
 // 消息通过网关服务器推送到channel中
 func pushMessage(packet *pkt.LogicPkt) error {
+	l := log.WithField("func", "pushMessage")
 	server, _ := packet.GetMeta(common.MetaDestServer)
 	if server != c.Srv.ServiceID() {
 		return fmt.Errorf("dest_server is incorrect, %s != %s", server, c.Srv.ServiceID())
@@ -149,14 +150,14 @@ func pushMessage(packet *pkt.LogicPkt) error {
 	packet.DelMeta(common.MetaDestServer)
 	packet.DelMeta(common.MetaDestChannels)
 	payload := pkt.Marshal(packet)
-	log.Debugf("Push to %v %v", channelIDs, packet)
+	l.Infof("Push to %v %v", channelIDs, packet)
 
 	for _, channel := range channelIDs {
 		messageOutFlowBytes.WithLabelValues(packet.Command).Add(float64(len(payload)))
 
 		err := c.Srv.Push(channel, payload)
 		if err != nil {
-			log.Debug(err)
+			l.Warn(err)
 		}
 	}
 
@@ -186,7 +187,7 @@ func ForwardWithSelector(serviceName string,
 	}
 	// add a tag in packet
 	packet.AddStringMeta(common.MetaDestServer, c.Srv.ServiceID())
-	log.Debugf("forward message to %v with %s", cli.ServiceID(), &packet.Header)
+	log.WithField("func", "ForwardWithSelector").Infof("forward message to %v with %s", cli.ServiceID(), &packet.Header)
 	return cli.Send(pkt.Marshal(packet))
 }
 
@@ -205,22 +206,21 @@ func shutdown() error {
 	//2.deregister from naming
 	err = c.Naming.Deregister(c.Srv.ServiceID())
 	if err != nil {
-		log.Warnln(err)
+		log.WithField("func", "shutdown").Warnln(err)
 	}
 	//3. unsubscribe deps events from naming
 	for dep := range c.deps {
 		_ = c.Naming.Unsubscribe(dep)
 	}
 
-	log.Infoln("shutdown")
+	log.WithField("func", "shutdown").Infoln("shutdown")
 	return nil
 }
 
-func lookup(serviceName string,
-	header *pkt.Header, selector Selector) (x.Client, error) {
+func lookup(serviceName string, header *pkt.Header, selector Selector) (x.Client, error) {
 	//来自于 connect2Service
 	clients, ok := c.srvClients[serviceName]
-	log.Infoln("service found in container.lookup: ", c.srvClients)
+	log.WithField("func", "lookup").Infoln("service found: ", c.srvClients)
 	if !ok {
 		return nil, fmt.Errorf("service %s not found", serviceName)
 	}
@@ -250,14 +250,15 @@ func EnableMonitor(listen string) {
 			})
 			// add prometheus metrics
 			http.Handle("/metrics", promhttp.Handler())
+
 			_ = http.ListenAndServe(listen, nil)
 		}()
 	})
 }
 
 // SetSelector 上层业务注册一个自定义的服务路由器
-func SetSelector(selector Selector) {
-	c.selector = selector
+func SetSelector(s Selector) {
+	c.selector = s
 }
 
 func SetServiceNaming(nm naming.Naming) {
@@ -265,8 +266,9 @@ func SetServiceNaming(nm naming.Naming) {
 }
 
 func connect2Service(serviceName string) error {
-	log.Infoln("arrived connect2Service")
-	clients := NewClients(10)
+	l := log.WithField("func", "connect2Service")
+	l.Infoln("arrived")
+	clients := NewClients()
 	c.srvClients[serviceName] = clients
 	// 1. 首先Watch服务的新增
 	delay := time.Second * 10
@@ -275,8 +277,7 @@ func connect2Service(serviceName string) error {
 			if _, ok := clients.Get(service.ServiceID()); ok {
 				continue
 			}
-			log.WithField("func", "connectToService").
-				Infof("Watch a new service: %v", service)
+			l.Infof("Watch a new service: %+v", service)
 
 			service.GetMeta()[KeyServiceState] = StateYoung
 			go func(service x.ServiceRegistration) {
@@ -286,7 +287,7 @@ func connect2Service(serviceName string) error {
 
 			_, err := buildClient(clients, service)
 			if err != nil {
-				logger.Warn(err)
+				l.Warn(err)
 			}
 		}
 	})
@@ -298,13 +299,13 @@ func connect2Service(serviceName string) error {
 	if err != nil {
 		return err
 	}
-	log.Info("find service ", services)
+	l.Info("find service ", services)
 	for _, service := range services {
 		// 标记为StateAdult
 		service.GetMeta()[KeyServiceState] = StateAdult
-		_, err := buildClient(clients, service)
+		_, err = buildClient(clients, service)
 		if err != nil {
-			logger.Warn(err)
+			l.Warn(err)
 		}
 	}
 	return nil
@@ -343,7 +344,7 @@ func buildClient(clients ClientMap,
 	}
 	//4.read messages
 	go func(cli x.Client) {
-		err := readLoop(cli)
+		err = readLoop(cli)
 		if err != nil {
 			log.Debug(err)
 		}
@@ -357,15 +358,12 @@ func buildClient(clients ClientMap,
 
 // 由于是内部服务间消息转发，不需要基础协议中的心跳（有注册中心）
 func readLoop(cli x.Client) error {
-	log := logger.WithFields(logger.Fields{
-		"module": "container",
-		"func":   "readLoop",
-	})
-	log.Infof("readLoop started of %s %s", cli.ServiceID(), cli.ServiceName())
+	l := log.WithField("func", "readLoop")
+	l.Infof("readLoop started of %s %s", cli.ServiceID(), cli.ServiceName())
 	for {
 		frame, err := cli.Read()
 		if err != nil {
-			log.Trace(err)
+			l.Trace(err)
 			return err
 		}
 		if frame.GetOpCode() != x.OpBinary {
@@ -375,12 +373,12 @@ func readLoop(cli x.Client) error {
 
 		packet, err := pkt.MustReadLogicPkt(buf)
 		if err != nil {
-			log.Info(err)
+			l.Info(err)
 			continue
 		}
 		err = pushMessage(packet)
 		if err != nil {
-			log.Info(err)
+			l.Info(err)
 		}
 	}
 }

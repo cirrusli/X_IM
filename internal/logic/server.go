@@ -125,7 +125,8 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		Meta:     meta,
 	}
 	srvOpts := []x.ServerOption{
-		x.WithConnectionGPool(config.ConnectionGPool), x.WithMessageGPool(config.MessageGPool),
+		x.WithConnectionGPool(config.ConnectionGPool),
+		x.WithMessageGPool(config.MessageGPool),
 	}
 	srv := tcp.NewServer(config.Listen, service, srvOpts...)
 

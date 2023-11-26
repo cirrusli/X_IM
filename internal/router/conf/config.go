@@ -45,6 +45,6 @@ func Init(file string) (*Config, error) {
 			return nil, err
 		}
 	}
-
+	logger.Infoln("config: ", config)
 	return &config, nil
 }

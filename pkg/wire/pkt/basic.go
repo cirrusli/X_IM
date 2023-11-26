@@ -2,6 +2,7 @@ package pkt
 
 import (
 	"X_IM/pkg/wire/endian"
+	"fmt"
 	"io"
 )
 
@@ -22,9 +23,11 @@ func (p *BasicPkt) Decode(r io.Reader) error {
 	if p.Code, err = endian.ReadUint16(r); err != nil {
 		return err
 	}
+	fmt.Println("in pkt/packet.go:Decode():read code:", p.Code)
 	if p.Length, err = endian.ReadUint16(r); err != nil {
 		return err
 	}
+	fmt.Println("in pkt/packet.go:Decode():read length:", p.Length)
 	if p.Length > 0 {
 		if p.Body, err = endian.ReadFixedBytes(int(p.Length), r); err != nil {
 			return err

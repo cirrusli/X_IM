@@ -21,6 +21,7 @@ require (
 	github.com/panjf2000/ants/v2 v2.8.2
 	github.com/prometheus/client_golang v1.11.1
 	github.com/prometheus/common v0.26.0
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/segmentio/ksuid v1.0.4
 	github.com/sirupsen/logrus v1.9.3

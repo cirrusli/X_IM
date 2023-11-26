@@ -58,7 +58,7 @@ func NewClientWithProps(id, name string, meta map[string]string, opts ClientOpti
 
 // Connect to logic
 func (c *Client) Connect(addr string) error {
-	fmt.Println("in websocket/client.go:Connect():arrived here.")
+	fmt.Printf("in websocket/client.go:Connect():arrived here.\nwith Client: %+v\n", c)
 
 	_, err := url.Parse(addr)
 	if err != nil {
@@ -76,7 +76,7 @@ func (c *Client) Connect(addr string) error {
 	})
 	if err != nil {
 		atomic.CompareAndSwapInt32(&c.state, 1, 0)
-		return err
+		return fmt.Errorf("dialAndHandshake() error: %w", err)
 	}
 	if conn == nil {
 		return fmt.Errorf("conn is nil")

@@ -1,11 +1,11 @@
 ServiceID: occult01
 Listen: ":8080"
-PublicAddress: localhost # consul health check needed
+PublicAddress: 20.115.1.240 # consul health check needed
 PublicPort: 8080
 Tags:
   - occult
-#ConsulURL: 8.146.198.70:8500
-ConsulURL: localhost:8500
+ConsulURL: 8.146.198.70:8500
+#ConsulURL: localhost:8500
 RedisAddrs: 8.146.198.70:6379
 RedisPass: Redis:0617
 BaseDB: root:lzq@tcp(8.146.198.70:3306)/x_base?charset=utf8mb4&parseTime=True&loc=Local

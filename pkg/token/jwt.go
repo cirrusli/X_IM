@@ -32,7 +32,7 @@ func (t *Token) Valid() error {
 // Parse ParseJwtToken
 func Parse(secret, tk string) (*Token, error) {
 	var token = new(Token)
-	_, err := jwt.ParseWithClaims(tk, token, func(t *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(tk, token, func(t *jwt.Token) (any, error) {
 		return []byte(secret), nil
 	})
 	if err != nil {

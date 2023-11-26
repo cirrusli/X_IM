@@ -2,6 +2,14 @@
 
 长连接接入层，管理用户连接以及传递消息
 
+### docker-compose相关的prometheus.yml
+
+进入到 ~/data/prometheus 目录。如果该目录不存在，需要先创建它
+
+```bash
+mkdir -p ~/data/prometheus
+```
+
 ### 作用： 
 
 Gateway 是用户和 IM 系统之间的接口，负责用户接入、验证和消息传递等任务。

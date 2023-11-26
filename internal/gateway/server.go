@@ -26,7 +26,9 @@ type StartOptions struct {
 }
 
 const (
-	confWS    = "../internal/gateway/ws.yaml"
+	confWS = "../internal/gateway/ws.yaml"
+	//confWS = "../internal/gateway/ws2.yaml"
+
 	confTCP   = "../internal/gateway/tcp.yaml"
 	routePath = "../internal/gateway/route.json"
 	protocol  = "ws" //如果没有在命令行指定，就用这个默认值

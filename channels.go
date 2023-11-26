@@ -50,7 +50,7 @@ func (ch *ChannelsImpl) Get(id string) (Channel, bool) {
 }
 func (ch *ChannelsImpl) All() []Channel {
 	arr := make([]Channel, 0)
-	ch.channels.Range(func(key, val interface{}) bool {
+	ch.channels.Range(func(key, val any) bool {
 		arr = append(arr, val.(Channel))
 		return true
 	})

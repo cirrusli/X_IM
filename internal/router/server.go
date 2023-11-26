@@ -5,18 +5,26 @@ import (
 	"X_IM/internal/router/conf"
 	"X_IM/internal/router/ip"
 	"X_IM/pkg/logger"
+	"X_IM/pkg/middleware"
 	"X_IM/pkg/naming"
 	"X_IM/pkg/naming/consul"
 	"X_IM/pkg/wire/common"
 	"context"
 	"fmt"
 	"github.com/prometheus/common/log"
+	"net/http"
 	"path"
 
 	"github.com/kataras/iris/v12"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+)
+
+const (
+	confPath = "../internal/router/conf.yaml"
+	logPath  = "./data/router.log"
+	dataPath = "../internal/router/data"
 )
 
 type ServerStartOptions struct {
@@ -35,8 +43,8 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 			return RunServerStart(ctx, opts, version)
 		},
 	}
-	cmd.PersistentFlags().StringVarP(&opts.config, "config", "c", "./router/conf.yaml", "Config file")
-	cmd.PersistentFlags().StringVarP(&opts.data, "data", "d", "./router/data", "data path")
+	cmd.PersistentFlags().StringVarP(&opts.config, "config", "c", confPath, "Config file")
+	cmd.PersistentFlags().StringVarP(&opts.data, "data", "d", dataPath, "data path")
 	return cmd
 }
 
@@ -48,7 +56,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	}
 	_ = logger.Init(logger.Settings{
 		Level:    "info",
-		Filename: "./data/router.log",
+		Filename: logPath,
 	})
 
 	mappings, err := conf.LoadMapping(path.Join(opts.data, "mapping.json"))
@@ -97,7 +105,14 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	}
 
 	app := iris.Default()
-
+	// 限流
+	limiter := middleware.NewRateLimiter(middleware.SlidingWindow, 5, 5)
+	app.Use(func(ctx iris.Context) {
+		h := limiter.Limit(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx.Next()
+		}))
+		h.ServeHTTP(ctx.ResponseWriter(), ctx.Request())
+	})
 	app.Get("/health", func(ctx iris.Context) {
 		_, _ = ctx.WriteString("ok")
 	})

@@ -20,7 +20,7 @@ func NewRouter() *Router {
 		handlers:    NewTree(),
 		middlewares: make([]HandlerFunc, 0),
 	}
-	r.pool.New = func() interface{} {
+	r.pool.New = func() any {
 		return BuildContext()
 	}
 	return r

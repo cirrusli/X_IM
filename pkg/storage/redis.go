@@ -128,9 +128,9 @@ func KeyLocations(accounts ...string) []string {
 	return arr
 }
 
-//func (r *RedisStorage) GetBySingleFlight(ChannelID string, g *singleflight.Group) (interface{}, error) {
+//func (r *RedisStorage) GetBySingleFlight(ChannelID string, g *singleflight.Group) (any, error) {
 //	snKey := KeySession(ChannelID)
-//	bts, err, _ := g.Do(snKey, func() (interface{}, error) {
+//	bts, err, _ := g.Do(snKey, func() (any, error) {
 //
 //		return
 //	})

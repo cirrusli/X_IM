@@ -143,15 +143,15 @@ func (h *ServiceHandler) GroupGet(c iris.Context) {
 		return
 	}
 
-	result, err, _ := h.groupSingleflight.Do(groupID, func() (interface{}, error) {
+	result, err, _ := h.groupSingleflight.Do(groupID, func() (any, error) {
 		id, err := h.IDGen.ParseBase36(groupID)
 		if err != nil {
 			return nil, errors.New("group is invalid:" + groupID)
 		}
 		var group database.Group
-		logger.Debugln("Starting database query for group:", groupID)
+		logger.Infoln("Starting database query for group:", groupID)
 		err = h.BaseDB.First(&group, id.Int64()).Error
-		logger.Debugln("Finished database query for group:", groupID)
+		logger.Infoln("Finished database query for group:", groupID)
 		if err != nil {
 			return nil, err
 		}

@@ -18,6 +18,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const logPath = "./data/access.log"
+
 type Config struct {
 	ServiceID     string
 	NodeID        int64
@@ -115,7 +117,7 @@ func InitFailoverRedis(masterName string, sentinelAddrs []string, password strin
 
 func MakeAccessLog() *accesslog.AccessLog {
 	// Initialize a new access log middleware.
-	ac := accesslog.File("./access.log")
+	ac := accesslog.File(logPath)
 	// Remove this line to disable logging to console:
 	ac.AddOutput(os.Stdout)
 

@@ -1,6 +1,7 @@
 package pkt
 
 import (
+	log "X_IM/pkg/logger"
 	"X_IM/pkg/wire/common"
 	"bytes"
 	"fmt"
@@ -36,7 +37,7 @@ func MustReadBasicPkt(r io.Reader) (*BasicPkt, error) {
 }
 
 // Read 从buf中读取magic code进行判断，随后根据magic code进行反序列化
-func Read(r io.Reader) (interface{}, error) {
+func Read(r io.Reader) (any, error) {
 	magic := common.Magic{}
 	_, err := io.ReadFull(r, magic[:])
 	if err != nil {
@@ -44,10 +45,13 @@ func Read(r io.Reader) (interface{}, error) {
 	}
 	switch magic {
 	case common.MagicLogicPkt:
+		fmt.Printf("magic code %s is correct\n", magic)
 		p := new(LogicPkt)
 		if err := p.Decode(r); err != nil {
+			log.Warn("in pkt/packet.go:Read():decode failed.")
 			return nil, err
 		}
+
 		return p, nil
 	case common.MagicBasicPkt:
 		p := new(BasicPkt)

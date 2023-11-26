@@ -71,9 +71,22 @@ services:
     image: quay.io/prometheus/prometheus
     container_name: prometheus
     volumes:
+      # need to create this folder first,
+      # look at the ../internal/gateway/README.md
       - ~/data/prometheus:/etc/prometheus
     ports:
       - "9090:9090"
-
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin_pass
+      - GF_SECURITY_ADMIN_USER=admin_user
+    volumes:
+      - grafana-storage:/var/lib/grafana
+volumes:
+  grafana-storage:
 networks:
   xnet: {}

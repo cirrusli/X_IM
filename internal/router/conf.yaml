@@ -1,9 +1,9 @@
 ServiceID: router01
 Listen: ":8100"
-PublicAddress: localhost # consul health check needed
+PublicAddress: 20.115.1.240 # consul health check needed
 PublicPort: 8100 #just in HTTP server's port
 Tags:
   - router
 LogLevel: DEBUG
-#ConsulURL: 8.146.198.70:8500
-ConsulURL: localhost:8500
+ConsulURL: 8.146.198.70:8500
+#ConsulURL: localhost:8500

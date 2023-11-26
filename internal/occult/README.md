@@ -1,4 +1,4 @@
-关于 `occult` 服务的router.go:
+关于 `occult` 服务的server.go:
 
 HTTP 服务器部分，负责处理消息、群组、离线消息等相关的请求。以下是对代码的分析：
 
