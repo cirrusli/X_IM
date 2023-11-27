@@ -25,16 +25,16 @@ func MustReadLogicPkt(r io.Reader) (*LogicPkt, error) {
 	return nil, fmt.Errorf("packet is not a logic packet")
 }
 
-func MustReadBasicPkt(r io.Reader) (*BasicPkt, error) {
-	val, err := Read(r)
-	if err != nil {
-		return nil, err
-	}
-	if bp, ok := val.(*BasicPkt); ok {
-		return bp, nil
-	}
-	return nil, fmt.Errorf("packet is not a basic packet")
-}
+//func MustReadBasicPkt(r io.Reader) (*BasicPkt, error) {
+//	val, err := Read(r)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if bp, ok := val.(*BasicPkt); ok {
+//		return bp, nil
+//	}
+//	return nil, fmt.Errorf("packet is not a basic packet")
+//}
 
 // Read 从buf中读取magic code进行判断，随后根据magic code进行反序列化
 func Read(r io.Reader) (any, error) {

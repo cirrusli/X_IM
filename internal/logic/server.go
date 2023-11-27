@@ -107,6 +107,8 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		return err
 	}
 	cache := storage.NewRedisStorage(rdb)
+	//cache:=storage.NewRedisClusterStorage(rdb)
+
 	servHandler := server.NewServHandler(r, cache)
 
 	meta := make(map[string]string)

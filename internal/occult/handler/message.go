@@ -38,7 +38,8 @@ func (h *ServiceHandler) InsertUserMessage(c iris.Context) {
 func (h *ServiceHandler) insertUserMessage(req *rpc.InsertMessageReq) (int64, error) {
 	messageId := h.IDGen.Next().Int64()
 	messageContent := database.MessageContent{
-		ID:       messageId,
+		ID: messageId,
+		//ShardID:   database.HashCode(req.Dest),
 		Type:     byte(req.Message.Type),
 		Body:     req.Message.Body,
 		Extra:    req.Message.Extra,
@@ -47,7 +48,8 @@ func (h *ServiceHandler) insertUserMessage(req *rpc.InsertMessageReq) (int64, er
 	// 扩散写
 	idxs := make([]database.MessageIndex, 2)
 	idxs[0] = database.MessageIndex{
-		ID:        h.IDGen.Next().Int64(),
+		ID: h.IDGen.Next().Int64(),
+		//ShardID:   database.HashCode(req.Sender),
 		MessageID: messageId,
 		AccountA:  req.Dest,
 		AccountB:  req.Sender,
@@ -55,7 +57,8 @@ func (h *ServiceHandler) insertUserMessage(req *rpc.InsertMessageReq) (int64, er
 		SendTime:  req.SendTime,
 	}
 	idxs[1] = database.MessageIndex{
-		ID:        h.IDGen.Next().Int64(),
+		ID: h.IDGen.Next().Int64(),
+		//ShardID:   database.HashCode(m.Account),
 		MessageID: messageId,
 		AccountA:  req.Sender,
 		AccountB:  req.Dest,

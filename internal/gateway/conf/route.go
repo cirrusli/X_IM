@@ -1,10 +1,9 @@
 package conf
 
 import (
+	"X_IM/pkg/logger"
 	"github.com/bytedance/sonic"
 	"os"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Zone struct {
@@ -35,7 +34,6 @@ func ReadRoute(path string) (*Route, error) {
 	}
 
 	err = sonic.Unmarshal(bts, &conf)
-	//err = json.Unmarshal(bts, &conf)
 
 	if err != nil {
 		return nil, err
@@ -61,6 +59,10 @@ func ReadRoute(path string) (*Route, error) {
 	for _, wl := range conf.Whitelist {
 		rt.Whitelist[wl.Key] = wl.Value
 	}
-	logrus.Infoln("in conf/route.go ReadRoute(): ", rt)
+	logger.WithFields(logger.Fields{
+		"service": "gateway",
+		"pkg":     "conf",
+		"func":    "ReadRoute()",
+	}).Infoln("from route.json: ", rt)
 	return &rt, nil
 }

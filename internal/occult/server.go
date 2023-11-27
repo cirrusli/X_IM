@@ -109,6 +109,8 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 	}
 
 	_ = baseDB.AutoMigrate(&database.Group{}, &database.GroupMember{})
+	//TODO： 如果MySQL需要分区表，那么这里不用自动生成messageIndex
+	// 需要在scripts目录下使用sql直接生成表
 	_ = messageDB.AutoMigrate(&database.MessageIndex{}, &database.MessageContent{})
 
 	if config.NodeID == 0 {

@@ -12,12 +12,12 @@ import (
 )
 
 type RedisClusterStorage struct {
-	cli redis.Cluster
+	cli *redis.Cluster
 }
 
 func NewRedisClusterStorage(cli *redis.Cluster) x.SessionStorage {
 	return &RedisClusterStorage{
-		cli: *cli,
+		cli: cli,
 	}
 }
 

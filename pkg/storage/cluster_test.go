@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRedisClusterStorage_Add(t *testing.T) {
+func TestClusterAdd(t *testing.T) {
 	cluster, err := redis.NewCluster(
 		&redis.Options{
 			StartNodes:   []string{"127.0.0.1:7000", "127.0.0.1:7001", "127.0.0.1:7002"},
@@ -26,7 +26,7 @@ func TestRedisClusterStorage_Add(t *testing.T) {
 		ChannelID: "ch1",
 		GateID:    "gateway1",
 		Account:   "test1",
-		Device:    "Phone",
+		Device:    "iPhone",
 	})
 	assert.Nil(t, err)
 
@@ -34,7 +34,7 @@ func TestRedisClusterStorage_Add(t *testing.T) {
 		ChannelID: "ch2",
 		GateID:    "gateway1",
 		Account:   "test2",
-		Device:    "Pc",
+		Device:    "PC",
 	})
 
 	session, err := cc.Get("ch1")

@@ -16,7 +16,8 @@ type Model struct {
 }
 
 type MessageIndex struct {
-	ID        int64  `gorm:"primarykey"`
+	ID int64 `gorm:"primarykey"`
+	//ShardID   int32  `gorm:"shard_id"`
 	AccountA  string `gorm:"index;size:60;not null;comment:队列唯一标识"`
 	AccountB  string `gorm:"size:60;not null;comment:另一方"`
 	Direction byte   `gorm:"default:0;not null;comment:1 表示AccountA为发送者"`
@@ -59,3 +60,11 @@ type GroupMember struct {
 	Group   string `gorm:"uniqueIndex:uni_gp_acc;index;size:30"`
 	Alias   string `gorm:"size:30"`
 }
+
+//使用MySQL分区表启用
+//
+//func HashCode(key string) int32 {
+//	hash32 := crc32.NewIEEE()
+//	_, _ = hash32.Write([]byte(key))
+//	return int32(hash32.Sum32())
+//}

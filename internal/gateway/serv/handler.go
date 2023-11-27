@@ -30,6 +30,7 @@ type Handler struct {
 
 // Accept this connection
 func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, error) {
+	l := log.WithField("func", "Accept")
 	// 1. 读取登录包
 	_ = conn.SetReadDeadline(time.Now().Add(timeout))
 	frame, err := conn.ReadFrame()
@@ -40,7 +41,7 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 	buf := bytes.NewBuffer(frame.GetPayload())
 	req, err := pkt.MustReadLogicPkt(buf)
 	if err != nil {
-		log.Error("in Accept(): ", err)
+		l.Error("reading login packet: ", err)
 		return "", nil, err
 	}
 
@@ -50,7 +51,7 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 		resp.Status = pkt.Status_InvalidCommand
 		_ = conn.WriteFrame(x.OpBinary, pkt.Marshal(resp))
 
-		return "", nil, fmt.Errorf("is an \"InvalidCommand\" command")
+		return "", nil, fmt.Errorf("is an invalidcommand")
 	}
 	//3.unmarshal Body
 	var login pkt.LoginReq
@@ -74,7 +75,7 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 	}
 	//6.生成全局唯一的ChannelID
 	id := generateChannelID(h.ServiceID, tk.Account)
-	log.Infof("accept %v channel:%s", tk, id)
+	l.Infof("accept %v channel:%s", tk, id)
 
 	req.ChannelID = id
 	req.WriteBody(&pkt.Session{
@@ -90,7 +91,7 @@ func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, er
 	// 7. 把login.转发给Login服务
 	err = container.Forward(common.SNLogin, req)
 	if err != nil {
-		log.Errorf("container.Forward :%v", err)
+		l.Errorf("container.Forward :%v", err)
 		return "", nil, err
 	}
 	return id, x.Meta{
