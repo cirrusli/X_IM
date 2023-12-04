@@ -85,7 +85,7 @@ func (c *Client) Connect(addr string) error {
 
 	if c.options.Heartbeat > 0 {
 		go func() {
-			err := c.heartbeatLoop(conn)
+			err = c.heartbeatLoop(conn)
 			if err != nil {
 				logger.Error("heartbeatLoop stopped ", err)
 			}
@@ -108,7 +108,7 @@ func (c *Client) heartbeatLoop(conn net.Conn) error {
 func (c *Client) ping(conn net.Conn) error {
 	c.Lock()
 	defer c.Unlock()
-	//写消息之前通过conn.SetWriteDeadline重置写超时
+	//写消息之前重置写超时
 	//如果连接异常在发送端可以感知到
 	err := conn.SetWriteDeadline(time.Now().Add(c.options.WriteWait))
 	if err != nil {

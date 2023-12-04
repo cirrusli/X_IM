@@ -54,7 +54,7 @@ func NewServerStartCmd(ctx context.Context, version string) *cobra.Command {
 	return cmd
 }
 
-// RunServerStart run http logic server
+// RunServerStart run gateway server
 func RunServerStart(ctx context.Context, opts *StartOptions, version string) error {
 	config, err := conf.Init(opts.config)
 	if err != nil {

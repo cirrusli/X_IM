@@ -1,6 +1,7 @@
 package timingwheel
 
 import (
+	"X_IM/pkg/logger"
 	"X_IM/pkg/timingwheel/delayqueue"
 	"errors"
 	"sync/atomic"
@@ -14,8 +15,8 @@ type TimingWheeler interface {
 	advanceClock(expiration int64)
 	start()
 	stop()
-	AfterFunc(d time.Duration, f func()) *Timer
-	ScheduleFunc(s Scheduler, f func()) (t *Timer)
+	afterFunc(d time.Duration, f func()) *Timer
+	scheduleFunc(s Scheduler, f func()) (t *Timer)
 }
 
 // TimingWheel is an implementation of Hierarchical Timing Wheels.
@@ -37,10 +38,15 @@ type TimingWheel struct {
 	waitGroup waitGroupWrapper
 }
 
+// 全局的时间轮，对外部屏蔽，只提供Start、Stop、AfterFunc、ScheduleFunc函数
 var tw *TimingWheel
 
-// Init configs: tick:1s wheelSize:30
-func Init() {
+// Start configs: tick:1s wheelSize:30
+func Start() {
+	if tw != nil {
+		logger.WithField("module", "timingwheel").Warnln("timingwheel already started")
+		return
+	}
 	tw = NewTimingWheel(1*time.Second, 30)
 	tw.start()
 }
@@ -52,7 +58,13 @@ func Stop() {
 // AfterFunc 等待持续时间过去，然后在自己的 goroutine 中调用 f
 // 它返回一个 Timer，可使用其 Stop 方法取消调用
 func AfterFunc(d time.Duration, f func()) *Timer {
-	return tw.AfterFunc(d, f)
+	return tw.afterFunc(d, f)
+}
+
+// ScheduleFunc 根据 s 安排的执行计划(在它自己的 goroutine 中)调用 f
+// 它返回一个 Timer，可以使用其 Stop 方法取消调用。
+func ScheduleFunc(s Scheduler, f func()) (t *Timer) {
+	return tw.scheduleFunc(s, f)
 }
 
 // NewTimingWheel creates an instance of TimingWheel with the given tick and wheelSize.
@@ -156,7 +168,7 @@ func (tw *TimingWheel) advanceClock(expiration int64) {
 	}
 }
 
-// start starts the current timing wheel.
+// start the current timing wheel.
 func (tw *TimingWheel) start() {
 	tw.waitGroup.Wrap(func() {
 		tw.queue.Poll(tw.exitC,
@@ -176,7 +188,7 @@ func (tw *TimingWheel) start() {
 				//刷新处理过期的bucket
 				b.Flush(tw.addOrRun)
 			case <-tw.exitC:
-				//调用 stop 方法，关闭 exitC
+				//调用 Stop 方法，关闭 exitC
 				return
 			}
 		}
@@ -196,8 +208,8 @@ func (tw *TimingWheel) stop() {
 }
 
 // AfterFunc waits for the duration to elapse and then calls f in its own goroutine.
-// It returns a Timer that can be used to cancel the call using its stop method.
-func (tw *TimingWheel) AfterFunc(d time.Duration, f func()) *Timer {
+// It returns a Timer that can be used to cancel the call using its Stop method.
+func (tw *TimingWheel) afterFunc(d time.Duration, f func()) *Timer {
 	t := &Timer{
 		expiration: timeToMs(time.Now().UTC().Add(d)),
 		task:       f,
@@ -215,14 +227,14 @@ type Scheduler interface {
 	Next(time.Time) time.Time
 }
 
-// ScheduleFunc 根据 s 安排的执行计划(（)在它自己的 goroutine 中)调用 f。它返回一个定时器，可以使用其 Stop 方法取消调用。
+// ScheduleFunc 根据 s 安排的执行计划(在它自己的 goroutine 中)调用 f。它返回一个 Timer ，可以使用其 Stop 方法取消调用。
 //
 // 如果调用者想要中途终止执行计划，它必须停止定时器，并确保定时器实际上已经停止，
 // 因为在当前的实现中，定时器的过期和重新启动之间有一个间隙。确保的等待时间很短，因为间隙非常小。
 //
-// 在内部，ScheduleFunc 最初会询问第一次执行时间(通过调用 s.Next())，
+// 在内部，scheduleFunc 最初会询问第一次执行时间(通过调用 s.Next())，
 // 并在执行时间非零时创建一个定时器。之后，每次 f 即将被执行时，它都会询问下一个执行时间，如果时间非零，f 将在下一个执行时间被调用。
-func (tw *TimingWheel) ScheduleFunc(s Scheduler, f func()) (t *Timer) {
+func (tw *TimingWheel) scheduleFunc(s Scheduler, f func()) (t *Timer) {
 	expiration := s.Next(time.Now().UTC())
 	if expiration.IsZero() {
 		// No time is scheduled

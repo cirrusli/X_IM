@@ -45,7 +45,7 @@ func (b *bucket) Add(t *Timer) {
 
 func (b *bucket) remove(t *Timer) bool {
 	if t.getBucket() != b {
-		// If remove is called from within t.stop, and this happens just after the timing wheel's goroutine has:
+		// If remove is called from within t.Stop, and this happens just after the timing wheel's goroutine has:
 		//     1. removed t from b (through b.Flush -> b.remove)
 		//     2. moved t from b to another bucket ab (through b.Flush -> b.remove and ab.Add)
 		// then t.getBucket will return nil for case 1, or ab (non-nil) for case 2.

@@ -15,7 +15,7 @@ type Timer struct {
 	// The bucket that holds the list to which this timer's element belongs.
 	//
 	// NOTE: This field may be updated and read concurrently,
-	// through Timer.stop() and Bucket.Flush().
+	// through Timer.Stop() and Bucket.Flush().
 	b unsafe.Pointer // type: *bucket
 
 	// The timer's element.
@@ -30,13 +30,13 @@ func (t *Timer) setBucket(b *bucket) {
 	atomic.StorePointer(&t.b, unsafe.Pointer(b))
 }
 
-// stop prevents the Timer from firing. It returns true if the call
+// Stop prevents the Timer from firing. It returns true if the call
 // stops the timer, false if the timer has already expired or been stopped.
 //
 // If the timer t has already expired and the t.task has been started in its own
-// goroutine; stop does not wait for t.task to complete before returning. If the caller
+// goroutine; Stop does not wait for t.task to complete before returning. If the caller
 // needs to know whether t.task is completed, it must coordinate with t.task explicitly.
-func (t *Timer) stop() bool {
+func (t *Timer) Stop() bool {
 	stopped := false
 	for b := t.getBucket(); b != nil; b = t.getBucket() {
 		// If b.removeConn is called just after the timing wheel's goroutine has:

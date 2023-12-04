@@ -48,9 +48,9 @@ func (dq *DelayQueue) Offer(elem any, expiration int64) {
 }
 
 // Poll 持续等待一个元素过期，然后将过期的元素发送到通道 C
-func (dq *DelayQueue) Poll(exit chan struct{}, now func() int64) {
+func (dq *DelayQueue) Poll(exitC chan struct{}, nowF func() int64) {
 	for {
-		now := now()
+		now := nowF()
 
 		dq.mu.Lock()
 		item, delta := dq.pq.PeekAndShift(now)
@@ -65,9 +65,11 @@ func (dq *DelayQueue) Poll(exit chan struct{}, now func() int64) {
 				// no item in dq
 				select {
 				case <-dq.wakeupC:
+					// Wait until a new item is added.
 					continue
-				case <-exit:
+				case <-exitC:
 					dq.resetState()
+					return
 				}
 			} else if delta > 0 {
 				// At least one item is pending
@@ -79,10 +81,12 @@ func (dq *DelayQueue) Poll(exit chan struct{}, now func() int64) {
 					// 堆顶元素过期
 					// 这里与 Offer 操作并没有互斥，如果定时器到期和插入优先级更早的元素两个事件同时发生，所以需要如下操作
 					if atomic.SwapInt32(&dq.sleeping, 0) == 0 {
+						// A caller of Offer() is being blocked on sending to wakeupC,
+						// drain wakeupC to unblock the caller.
 						<-dq.wakeupC
 					}
 					continue
-				case <-exit:
+				case <-exitC:
 					dq.resetState()
 					return
 				}
@@ -92,8 +96,9 @@ func (dq *DelayQueue) Poll(exit chan struct{}, now func() int64) {
 		select {
 		case dq.C <- item.Value:
 			// 过期的元素已经成功发送
-		case <-exit:
+		case <-exitC:
 			dq.resetState()
+			return
 		}
 	}
 
