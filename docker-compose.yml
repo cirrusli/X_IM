@@ -61,7 +61,7 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_PORT: 9092
-      KAFKA_CREATE_TOPICS: "mytopic:1:1"
+      KAFKA_CREATE_TOPICS: "test:1:1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
