@@ -7,9 +7,46 @@ import (
 	"time"
 )
 
+const kafkaURL = "8.146.198.70:9092"
+
+func TestKafka(t *testing.T) {
+	// Initialize Kafka producer
+	producer, err := NewProducer([]string{kafkaURL}, "test")
+	if err != nil {
+		log.Fatalf("Failed to create Kafka producer: %v", err)
+	}
+	defer func(producer *Producer) {
+		_ = producer.Close()
+	}(producer)
+
+	// Initialize Kafka consumer
+	consumer, err := NewConsumer([]string{kafkaURL}, "test")
+	if err != nil {
+		log.Fatalf("Failed to create Kafka consumer: %v", err)
+	}
+	defer func(consumer *Consumer) {
+		_ = consumer.Close()
+	}(consumer)
+
+	// Start consuming messages in a new goroutine
+	go func() {
+		err := consumer.ConsumeMessages(func(msg []byte) {
+			// Handle the message here, e.g., write it to the database
+			log.Printf("Received message: %s", string(msg))
+		})
+		if err != nil {
+			log.Fatalf("Failed to consume messages: %v", err)
+		}
+	}()
+
+	// In your message handling function, send the message to Kafka
+	err = producer.SendMessage([]byte("test message"))
+	if err != nil {
+		log.Fatalf("Failed to send message: %v", err)
+	}
+}
 func TestConsumer(t *testing.T) {
-	kafkaURL := "8.146.198.70:9092" // 设置有效的 Kafka 服务器地址
-	testTopic := "test"             // 设置你要测试的主题名称
+	testTopic := "test" // 设置你要测试的主题名称
 
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
@@ -58,8 +95,7 @@ func TestConsumer(t *testing.T) {
 }
 
 func TestProducerWithOffset(t *testing.T) {
-	kafkaURL := "8.146.198.70:9092" // 设置有效的 Kafka 服务器地址
-	testTopic := "test"             // 设置你要测试的主题名称
+	testTopic := "test" // 设置你要测试的主题名称
 
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll

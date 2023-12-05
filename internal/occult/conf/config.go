@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"github.com/bytedance/sonic"
 	"github.com/kelseyhightower/envconfig"
-	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis/v7"
 	"github.com/kataras/iris/v12/middleware/accesslog"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -78,41 +75,6 @@ func Init(file string) (*Config, error) {
 	}
 	logger.Info("last: ", config)
 	return &config, nil
-}
-
-func InitRedis(addr string, pass string) (*redis.Client, error) {
-	redisDB := redis.NewClient(&redis.Options{
-		Addr:         addr,
-		Password:     pass,
-		DialTimeout:  time.Second * 5,
-		ReadTimeout:  time.Second * 5,
-		WriteTimeout: time.Second * 5,
-	})
-
-	_, err := redisDB.Ping().Result()
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	return redisDB, nil
-}
-
-// InitFailoverRedis init redis with sentinels
-func InitFailoverRedis(masterName string, sentinelAddrs []string, password string, timeout time.Duration) (*redis.Client, error) {
-	redisDB := redis.NewFailoverClient(&redis.FailoverOptions{
-		MasterName:    masterName,
-		SentinelAddrs: sentinelAddrs,
-		Password:      password,
-		DialTimeout:   time.Second * 5,
-		ReadTimeout:   timeout,
-		WriteTimeout:  timeout,
-	})
-
-	_, err := redisDB.Ping().Result()
-	if err != nil {
-		logrus.Warn(err)
-	}
-	return redisDB, nil
 }
 
 func MakeAccessLog() *accesslog.AccessLog {

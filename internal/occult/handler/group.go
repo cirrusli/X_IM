@@ -2,7 +2,6 @@ package handler
 
 import (
 	"X_IM/internal/occult/database"
-	"X_IM/pkg/logger"
 	"X_IM/pkg/wire/rpc"
 	"errors"
 	"github.com/bwmarrin/snowflake"
@@ -118,7 +117,7 @@ func (h *ServiceHandler) GroupMembers(c iris.Context) {
 		return
 	}
 	var members []database.GroupMember
-	err := h.BaseDB.Order("Updated_At asc").Find(&members, database.GroupMember{Group: group}).Error
+	err := h.BaseDB.Select("account", "alias", "created_at").Order("updated_at asc").Find(&members, database.GroupMember{Group: group}).Error
 	if err != nil {
 		c.StopWithError(iris.StatusInternalServerError, err)
 		return
@@ -149,9 +148,10 @@ func (h *ServiceHandler) GroupGet(c iris.Context) {
 			return nil, errors.New("group is invalid:" + groupID)
 		}
 		var group database.Group
-		logger.Infoln("Starting database query for group:", groupID)
-		err = h.BaseDB.First(&group, id.Int64()).Error
-		logger.Infoln("Finished database query for group:", groupID)
+
+		err = h.BaseDB.Select("id", "name", "avatar", "introduction", "owner", "created_at").
+			First(&group, id.Int64()).Error
+
 		if err != nil {
 			return nil, err
 		}

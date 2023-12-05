@@ -121,7 +121,7 @@ func RunServerStart(ctx context.Context, opts *ServerStartOptions, version strin
 		return err
 	}
 
-	rdb, err := conf.InitRedis(config.RedisAddrs, config.RedisPass)
+	rdb, err := database.InitRedis(config.RedisAddrs, config.RedisPass)
 	if err != nil {
 		return err
 	}
