@@ -11,7 +11,7 @@ WORKDIR /build
 
 COPY .. .
 
-RUN go build -o app ./internal
+RUN go build -o app ./cmd
 
 FROM scratch
 

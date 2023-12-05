@@ -14,7 +14,7 @@ COPY .. .
 # RUN go-wrapper install -ldflags "-linkmode external -extldflags -static"
 # RUN go build -a -ldflags '-linkmode external -extldflags "-static"' -o app ./internal
 
-RUN go build -o app ./internal
+RUN go build -o app ./cmd
 
 FROM scratch
 
