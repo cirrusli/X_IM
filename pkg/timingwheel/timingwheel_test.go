@@ -8,8 +8,8 @@ import (
 
 func TestStart(t *testing.T) {
 	tw := NewTimingWheel(1*time.Second, 30)
-	tw.start()
-	defer tw.stop()
+	tw.Start()
+	defer tw.Stop()
 
 	done := make(chan struct{})
 
@@ -32,7 +32,7 @@ func TestStart(t *testing.T) {
 
 func TestStop(t *testing.T) {
 	tw := NewTimingWheel(1*time.Second, 30)
-	tw.start()
+	tw.Start()
 
 	timer := &Timer{
 		expiration: timeToMs(time.Now().UTC().Add(1 * time.Second)),
@@ -40,7 +40,7 @@ func TestStop(t *testing.T) {
 	}
 	tw.add(timer)
 
-	tw.stop()
+	tw.Stop()
 
 	// 检查 exitC 通道是否已经被关闭，如果已关闭可以立即接收到false
 	select {
@@ -57,14 +57,14 @@ func TestStop(t *testing.T) {
 
 func TestAfterFunc(t *testing.T) {
 	tw := NewTimingWheel(1*time.Second, 30)
-	tw.start()
-	defer tw.stop()
+	tw.Start()
+	defer tw.Stop()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	// 创建一个定时任务，该任务在 1 秒后执行并通知 WaitGroup
-	tw.afterFunc(1*time.Second, func() {
+	tw.AfterFunc(1*time.Second, func() {
 		wg.Done()
 	})
 
@@ -94,8 +94,8 @@ func (s *ScheduleFuncTest) Next(t time.Time) time.Time {
 
 func TestScheduleFunc(t *testing.T) {
 	tw := NewTimingWheel(1*time.Second, 30)
-	tw.start()
-	defer tw.stop()
+	tw.Start()
+	defer tw.Stop()
 
 	flag := false
 
@@ -124,8 +124,8 @@ func TestScheduleFunc(t *testing.T) {
 // timingwheel_test origin version
 func TestTimingWheel_AfterFunc(t *testing.T) {
 	tw := NewTimingWheel(time.Millisecond, 20)
-	tw.start()
-	defer tw.stop()
+	tw.Start()
+	defer tw.Stop()
 
 	durations := []time.Duration{
 		1 * time.Millisecond,
@@ -141,7 +141,7 @@ func TestTimingWheel_AfterFunc(t *testing.T) {
 			exitC := make(chan time.Time)
 
 			start := time.Now().UTC()
-			tw.afterFunc(d, func() {
+			tw.AfterFunc(d, func() {
 				exitC <- time.Now().UTC()
 			})
 
@@ -172,17 +172,17 @@ func (s *scheduler) Next(prev time.Time) time.Time {
 
 func TestTimingWheel_ScheduleFunc(t *testing.T) {
 	tw := NewTimingWheel(time.Millisecond, 20)
-	tw.start()
-	defer tw.stop()
+	tw.Start()
+	defer tw.Stop()
 
 	s := &scheduler{intervals: []time.Duration{
-		1 * time.Millisecond,   // start + 1ms
-		4 * time.Millisecond,   // start + 5ms
-		5 * time.Millisecond,   // start + 10ms
-		40 * time.Millisecond,  // start + 50ms
-		50 * time.Millisecond,  // start + 100ms
-		400 * time.Millisecond, // start + 500ms
-		500 * time.Millisecond, // start + 1s
+		1 * time.Millisecond,   // Start + 1ms
+		4 * time.Millisecond,   // Start + 5ms
+		5 * time.Millisecond,   // Start + 10ms
+		40 * time.Millisecond,  // Start + 50ms
+		50 * time.Millisecond,  // Start + 100ms
+		400 * time.Millisecond, // Start + 500ms
+		500 * time.Millisecond, // Start + 1s
 	}}
 
 	exitC := make(chan time.Time, len(s.intervals))

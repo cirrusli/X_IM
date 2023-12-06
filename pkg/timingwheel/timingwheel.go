@@ -13,9 +13,9 @@ type TimingWheeler interface {
 	add(t *Timer) bool
 	addOrRun(t *Timer)
 	advanceClock(expiration int64)
-	start()
-	stop()
-	afterFunc(d time.Duration, f func()) *Timer
+	Start()
+	Stop()
+	AfterFunc(d time.Duration, f func()) *Timer
 	scheduleFunc(s Scheduler, f func()) (t *Timer)
 }
 
@@ -48,17 +48,17 @@ func Start() {
 		return
 	}
 	tw = NewTimingWheel(1*time.Second, 30)
-	tw.start()
+	tw.Start()
 }
 
 func Stop() {
-	tw.stop()
+	tw.Stop()
 }
 
 // AfterFunc 等待持续时间过去，然后在自己的 goroutine 中调用 f
 // 它返回一个 Timer，可使用其 Stop 方法取消调用
 func AfterFunc(d time.Duration, f func()) *Timer {
-	return tw.afterFunc(d, f)
+	return tw.AfterFunc(d, f)
 }
 
 // ScheduleFunc 根据 s 安排的执行计划(在它自己的 goroutine 中)调用 f
@@ -168,8 +168,8 @@ func (tw *TimingWheel) advanceClock(expiration int64) {
 	}
 }
 
-// start the current timing wheel.
-func (tw *TimingWheel) start() {
+// Start starts the current timing wheel.
+func (tw *TimingWheel) Start() {
 	tw.waitGroup.Wrap(func() {
 		tw.queue.Poll(tw.exitC,
 			func() int64 {
@@ -195,21 +195,21 @@ func (tw *TimingWheel) start() {
 	})
 }
 
-// stop stops the current timing wheel.
+// Stop stops the current timing wheel.
 //
 // NOTE: timing wheel must have be added with elem yet, otherwise stop will panic.
 //
 // If there is any timer's task being running in its own goroutine, stop does
 // not wait for the task to complete before returning. If the caller needs to
 // know whether the task is completed, it must coordinate with the task explicitly.
-func (tw *TimingWheel) stop() {
+func (tw *TimingWheel) Stop() {
 	close(tw.exitC)
 	tw.waitGroup.Wait()
 }
 
 // AfterFunc waits for the duration to elapse and then calls f in its own goroutine.
 // It returns a Timer that can be used to cancel the call using its Stop method.
-func (tw *TimingWheel) afterFunc(d time.Duration, f func()) *Timer {
+func (tw *TimingWheel) AfterFunc(d time.Duration, f func()) *Timer {
 	t := &Timer{
 		expiration: timeToMs(time.Now().UTC().Add(d)),
 		task:       f,
