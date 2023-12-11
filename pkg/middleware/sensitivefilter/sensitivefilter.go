@@ -1,4 +1,4 @@
-package middleware
+package sensitivefilter
 
 type Filter interface {
 	FilterSpecialChar(text string) string

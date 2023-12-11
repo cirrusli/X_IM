@@ -1,4 +1,4 @@
-package middleware
+package sensitivefilter
 
 import (
 	"X_IM/pkg/logger"
