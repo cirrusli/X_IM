@@ -13,7 +13,12 @@ MySQL、Redis、Consul
 ```bash
 docker-compose -f "docker-compose.yml" up -d --build
 ```
+### 更改相关server的配置文件
 
+注意MySQL、Redis等的连接账户密码配置
+### MySQL中建立数据库
+
+新建x_base、x_message两个DB，字符集为utf8mb4，排序规则为utf8mb4_general_ci
 ### 服务启动
 
 Gateway、Router、Logic、Occult
@@ -25,19 +30,17 @@ go run main.go [gateway/router/logic/occult]
 ### 项目目录结构
 
 ```bash
-│─assets
+├─assets
 │  └─data
 ├─cmd
+│  └─data
 ├─docs
 ├─examples
 │  ├─benchmark
+│  ├─fuzz
 │  ├─mock
-│  │  └─dialer
 │  └─ut
-│      ├─gateway
-│      └─logic
 ├─internal
-│  ├─data
 │  ├─gateway
 │  │  ├─conf
 │  │  └─serv
@@ -57,6 +60,7 @@ go run main.go [gateway/router/logic/occult]
 │      └─ip
 ├─pkg
 │  ├─container
+│  ├─ip
 │  ├─kafka
 │  ├─logger
 │  ├─middleware
@@ -64,14 +68,17 @@ go run main.go [gateway/router/logic/occult]
 │  │  └─consul
 │  ├─storage
 │  ├─tcp
+│  ├─timingwheel
+│  │  └─delayqueue
 │  ├─token
 │  ├─websocket
-│  └─wire
-│      ├─common
-│      ├─endian
-│      ├─pkt
-│      ├─protofiles
-│      └─rpc
+│  ├─wire
+│  │  ├─common
+│  │  ├─endian
+│  │  ├─pkt
+│  │  ├─protofiles
+│  │  └─rpc
+│  └─x
 └─scripts
 
 ```
