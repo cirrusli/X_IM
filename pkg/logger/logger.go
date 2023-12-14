@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	std *logrus.Logger = logrus.New()
+	std = logrus.New()
 )
 
 type Fields map[string]any
@@ -24,7 +24,7 @@ type Options struct {
 }
 
 //func init() {
-// 经常直接调用logger.Info()，导致日志输出的文件名和行号不正确
+// 经常直接调用全局的logger.Info()，导致日志输出的文件名和行号不正确
 //	std.SetReportCaller(true)
 //}
 
