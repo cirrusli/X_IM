@@ -13,7 +13,12 @@ MySQL、Redis、Consul
 ```bash
 docker-compose -f "docker-compose.yml" up -d --build
 ```
+### 更改相关server的配置文件
 
+注意MySQL、Redis等的连接账户密码配置
+### MySQL中建立数据库
+
+新建x_base、x_message两个DB，字符集为utf8mb4，排序规则为utf8mb4_general_ci
 ### 服务启动
 
 Gateway、Router、Logic、Occult
