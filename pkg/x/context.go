@@ -1,7 +1,6 @@
-package X_IM
+package x
 
 import (
-	"X_IM/pkg"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/wire/common"
 	"X_IM/pkg/wire/pkt"
@@ -32,7 +31,7 @@ type Context interface {
 	// Resp 给发送方回复一条消息
 	Resp(status pkt.Status, body proto.Message) error
 	// Dispatch 给指定的接收方发送一条消息
-	Dispatch(body proto.Message, recvs ...*pkg.Location) error
+	Dispatch(body proto.Message, recvs ...*Location) error
 	Next()
 }
 
@@ -126,7 +125,7 @@ func (c *ContextImpl) Resp(status pkt.Status, body proto.Message) error {
 }
 
 // Dispatch 采用合并转发
-func (c *ContextImpl) Dispatch(body proto.Message, recvs ...*pkg.Location) error {
+func (c *ContextImpl) Dispatch(body proto.Message, recvs ...*Location) error {
 	if len(recvs) == 0 {
 		return nil
 	}

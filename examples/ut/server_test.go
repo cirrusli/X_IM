@@ -1,10 +1,10 @@
 package ut
 
 import (
-	x "X_IM"
 	"X_IM/examples/mock"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/websocket"
+	"X_IM/pkg/x"
 	"fmt"
 	"github.com/panjf2000/ants/v2"
 	"strings"

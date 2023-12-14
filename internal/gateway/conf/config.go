@@ -1,7 +1,7 @@
 package conf
 
 import (
-	x "X_IM/pkg"
+	x "X_IM/pkg/ip"
 	"X_IM/pkg/logger"
 	"fmt"
 	"github.com/bytedance/sonic"

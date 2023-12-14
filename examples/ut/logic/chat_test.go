@@ -1,10 +1,10 @@
 package logic
 
 import (
-	x "X_IM"
 	"X_IM/examples/mock/dialer"
 	"X_IM/pkg/wire/common"
 	"X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"bytes"
 	"github.com/stretchr/testify/assert"
 	"testing"

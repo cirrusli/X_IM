@@ -1,7 +1,7 @@
 package naming
 
 import (
-	x "X_IM"
+	"X_IM/pkg/x"
 	"fmt"
 )
 

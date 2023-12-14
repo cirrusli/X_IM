@@ -1,7 +1,7 @@
 package conf
 
 import (
-	"X_IM/pkg"
+	"X_IM/pkg/ip"
 	"X_IM/pkg/logger"
 	"fmt"
 	"github.com/bytedance/sonic"
@@ -62,7 +62,7 @@ func Init(file string) (*Config, error) {
 	logger.Infoln("viper: ", config)
 
 	if config.ServiceID == "" {
-		localIP := pkg.GetLocalIP()
+		localIP := ip.GetLocalIP()
 		config.ServiceID = fmt.Sprintf("occult_%s", strings.ReplaceAll(localIP, ".", ""))
 		arr := strings.Split(localIP, ".")
 		if len(arr) == 4 {
@@ -71,7 +71,7 @@ func Init(file string) (*Config, error) {
 		}
 	}
 	if config.PublicAddress == "" {
-		config.PublicAddress = pkg.GetLocalIP()
+		config.PublicAddress = ip.GetLocalIP()
 	}
 	logger.Info("last: ", config)
 	return &config, nil

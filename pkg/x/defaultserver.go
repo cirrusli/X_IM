@@ -1,4 +1,4 @@
-package X_IM
+package x
 
 //重构tcp/websocket的server逻辑，抽离统一为default server
 

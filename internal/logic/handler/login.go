@@ -1,9 +1,9 @@
 package handler
 
 import (
-	x "X_IM"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/wire/pkt"
+	x2 "X_IM/pkg/x"
 	"errors"
 )
 
@@ -14,7 +14,7 @@ func NewLoginHandler() *LoginHandler {
 	return &LoginHandler{}
 }
 
-func (h *LoginHandler) DoLogin(ctx x.Context) {
+func (h *LoginHandler) DoLogin(ctx x2.Context) {
 	log := logger.WithField("func", "DoLogin")
 	var session pkt.Session
 	if err := ctx.ReadBody(&session); err != nil {
@@ -26,7 +26,7 @@ func (h *LoginHandler) DoLogin(ctx x.Context) {
 
 	// 2. 检查当前账号是否在其他地方登录
 	old, err := ctx.GetLocation(session.Account, "")
-	if err != nil && !errors.Is(err, x.ErrSessionNil) {
+	if err != nil && !errors.Is(err, x2.ErrSessionNil) {
 		_ = ctx.RespWithError(pkt.Status_SystemException, err)
 		return
 	}
@@ -54,7 +54,7 @@ func (h *LoginHandler) DoLogin(ctx x.Context) {
 	_ = ctx.Resp(pkt.Status_Success, resp)
 }
 
-func (h *LoginHandler) DoLogout(ctx x.Context) {
+func (h *LoginHandler) DoLogout(ctx x2.Context) {
 	logger.WithField("func", "DoLogout").Infof("do Logout of %s %s ",
 		ctx.Session().GetChannelID(), ctx.Session().GetAccount())
 

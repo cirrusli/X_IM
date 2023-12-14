@@ -1,8 +1,8 @@
 package storage
 
 import (
-	x "X_IM"
 	"X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"github.com/gitstliu/go-redis-cluster"
 	"testing"
 	"time"

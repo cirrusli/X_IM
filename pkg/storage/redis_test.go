@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"X_IM"
 	"X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"github.com/go-redis/redis/v7"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -68,7 +68,7 @@ func TestCRUD(t *testing.T) {
 	assert.Equal(t, "channel2", loc.ChannelID)
 
 	arr, err = s.GetLocations("wrong_account")
-	assert.Equal(t, X_IM.ErrSessionNil, err)
+	assert.Equal(t, x.ErrSessionNil, err)
 	assert.Equal(t, 0, len(arr))
 
 }

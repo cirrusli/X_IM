@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	x "X_IM"
+	"X_IM/pkg/x"
 	"bufio"
 	"fmt"
 	"github.com/gobwas/ws"

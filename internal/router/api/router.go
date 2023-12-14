@@ -1,12 +1,12 @@
 package api
 
 import (
-	x "X_IM"
 	"X_IM/internal/router/conf"
 	"X_IM/internal/router/ip"
-	"X_IM/pkg"
+	ip2 "X_IM/pkg/ip"
 	"X_IM/pkg/naming"
 	"X_IM/pkg/wire/common"
+	"X_IM/pkg/x"
 	"fmt"
 	"hash/crc32"
 	"log"
@@ -32,7 +32,7 @@ type LookUpResp struct {
 }
 
 func (r *RouterApi) Lookup(c iris.Context) {
-	reqIP := pkg.RealIP(c.Request())
+	reqIP := ip2.RealIP(c.Request())
 	token := c.Params().Get("token")
 
 	// step 1

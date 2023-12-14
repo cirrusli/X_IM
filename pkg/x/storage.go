@@ -1,7 +1,6 @@
-package X_IM
+package x
 
 import (
-	"X_IM/pkg"
 	"X_IM/pkg/wire/pkt"
 	"errors"
 )
@@ -16,8 +15,8 @@ type SessionStorage interface {
 	// Get session by channelId
 	Get(channelId string) (*pkt.Session, error)
 	// GetLocations by accounts
-	GetLocations(account ...string) ([]*pkg.Location, error)
+	GetLocations(account ...string) ([]*Location, error)
 	// GetLocation by account and device.
 	// device parameter is not supported yet,there will be placed with ""
-	GetLocation(account string, device string) (*pkg.Location, error)
+	GetLocation(account string, device string) (*Location, error)
 }

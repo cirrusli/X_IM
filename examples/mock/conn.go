@@ -1,7 +1,7 @@
 package mock
 
 import (
-	x "X_IM"
+	"X_IM/pkg/x"
 	"github.com/stretchr/testify/mock"
 	"net"
 	"time"

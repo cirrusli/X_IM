@@ -1,9 +1,9 @@
 package api
 
 import (
-	x "X_IM"
 	"X_IM/internal/router/conf"
 	"X_IM/pkg/naming"
+	"X_IM/pkg/x"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -1,9 +1,9 @@
 package serv
 
 import (
-	x "X_IM"
 	"X_IM/pkg/tcp"
 	"X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"google.golang.org/protobuf/proto"
 	"net"
 )

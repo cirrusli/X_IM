@@ -1,8 +1,8 @@
 package consul
 
 import (
-	x "X_IM"
 	"X_IM/pkg/naming"
+	"X_IM/pkg/x"
 	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"

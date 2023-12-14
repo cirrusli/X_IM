@@ -1,10 +1,10 @@
 package serv
 
 import (
-	x "X_IM"
 	"X_IM/internal/gateway/conf"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"hash/crc32"
 	"math/rand"
 )

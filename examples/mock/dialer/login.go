@@ -1,9 +1,9 @@
 package dialer
 
 import (
-	x "X_IM"
 	"X_IM/pkg/token"
 	"X_IM/pkg/websocket"
+	"X_IM/pkg/x"
 )
 
 func Login(wsurl, account string, appSecrets ...string) (x.Client, error) {

@@ -1,6 +1,8 @@
 package naming
 
-import x "X_IM"
+import (
+	"X_IM/pkg/x"
+)
 
 type Naming interface {
 	// Find 服务发现，支持通过tag查询

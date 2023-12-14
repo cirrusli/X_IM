@@ -1,4 +1,4 @@
-package X_IM
+package x
 
 import (
 	"X_IM/pkg/logger"

@@ -1,10 +1,10 @@
 package serv
 
 import (
-	x "X_IM"
 	"X_IM/pkg/naming"
 	"X_IM/pkg/wire/common"
 	pkt2 "X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/assert"
 	"testing"

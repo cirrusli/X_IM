@@ -1,10 +1,10 @@
 package dialer
 
 import (
-	x "X_IM"
 	"X_IM/pkg/token"
 	"X_IM/pkg/wire/common"
 	"X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"bytes"
 	"context"
 	"fmt"

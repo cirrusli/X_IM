@@ -1,8 +1,8 @@
 package container
 
 import (
-	x "X_IM"
 	"X_IM/pkg/wire/pkt"
+	"X_IM/pkg/x"
 	"hash/crc32"
 )
 

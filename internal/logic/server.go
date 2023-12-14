@@ -1,7 +1,6 @@
 package logic
 
 import (
-	x "X_IM"
 	"X_IM/internal/logic/client"
 	"X_IM/internal/logic/conf"
 	"X_IM/internal/logic/handler"
@@ -14,6 +13,7 @@ import (
 	"X_IM/pkg/storage"
 	"X_IM/pkg/tcp"
 	"X_IM/pkg/wire/common"
+	x2 "X_IM/pkg/x"
 	"context"
 	"fmt"
 	"github.com/go-resty/resty/v2"
@@ -78,7 +78,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		messageService = client.NewMessageServiceWithSRV("http", srvRecord)
 	}
 
-	r := x.NewRouter()
+	r := x2.NewRouter()
 	r.Use(middleware.Recover())
 
 	// login
@@ -126,13 +126,13 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		Tags:     config.Tags,
 		Meta:     meta,
 	}
-	srvOpts := []x.ServerOption{
-		x.WithConnectionGPool(config.ConnectionGPool),
-		x.WithMessageGPool(config.MessageGPool),
+	srvOpts := []x2.ServerOption{
+		x2.WithConnectionGPool(config.ConnectionGPool),
+		x2.WithMessageGPool(config.MessageGPool),
 	}
 	srv := tcp.NewServer(config.Listen, service, srvOpts...)
 
-	srv.SetReadWait(x.DefaultReadWait)
+	srv.SetReadWait(x2.DefaultReadWait)
 	srv.SetAcceptor(servHandler)
 	srv.SetMessageListener(servHandler)
 	srv.SetStateListener(servHandler)

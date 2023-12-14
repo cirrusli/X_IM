@@ -1,9 +1,9 @@
 package consul
 
 import (
-	x "X_IM"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/naming"
+	"X_IM/pkg/x"
 	"errors"
 	"fmt"
 	"github.com/hashicorp/consul/api"
