@@ -10,7 +10,7 @@ import (
 	"X_IM/pkg/tcp"
 	"X_IM/pkg/websocket"
 	"X_IM/pkg/wire/common"
-	x2 "X_IM/pkg/x"
+	"X_IM/pkg/x"
 	"context"
 	"fmt"
 	"github.com/spf13/cobra"
@@ -75,7 +75,7 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		fmt.Sprintf("http://%s:%d/health", config.PublicAddress, config.MonitorPort))
 	meta["domain"] = config.Domain
 
-	var srv x2.Server
+	var srv x.Server
 	service := &naming.DefaultService{
 		ID:       config.ServiceID,
 		Name:     config.ServiceName,
@@ -85,9 +85,9 @@ func RunServerStart(ctx context.Context, opts *StartOptions, version string) err
 		Tags:     config.Tags,
 		Meta:     meta,
 	}
-	srvOpts := []x2.ServerOption{
-		x2.WithConnectionGPool(config.ConnectionGPool),
-		x2.WithMessageGPool(config.MessageGPool),
+	srvOpts := []x.ServerOption{
+		x.WithConnectionGPool(config.ConnectionGPool),
+		x.WithMessageGPool(config.MessageGPool),
 	}
 	if opts.protocol == "ws" {
 		srv = websocket.NewServer(config.Listen, service, srvOpts...)

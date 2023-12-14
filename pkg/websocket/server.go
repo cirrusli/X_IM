@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	x2 "X_IM/pkg/x"
+	"X_IM/pkg/x"
 	"bufio"
 	"github.com/gobwas/ws"
 	"net"
@@ -12,15 +12,15 @@ type Upgrader struct {
 }
 
 // NewServer NewServer
-func NewServer(listen string, service x2.ServiceRegistration, options ...x2.ServerOption) x2.Server {
-	return x2.NewServer(listen, service, new(Upgrader), options...)
+func NewServer(listen string, service x.ServiceRegistration, options ...x.ServerOption) x.Server {
+	return x.NewServer(listen, service, new(Upgrader), options...)
 }
 
 func (u *Upgrader) Name() string {
 	return "WebSocket.Server"
 }
 
-func (u *Upgrader) Upgrade(rawConn net.Conn, rd *bufio.Reader, wr *bufio.Writer) (x2.Conn, error) {
+func (u *Upgrader) Upgrade(rawConn net.Conn, rd *bufio.Reader, wr *bufio.Writer) (x.Conn, error) {
 	_, err := ws.Upgrade(rawConn)
 	if err != nil {
 		return nil, err

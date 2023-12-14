@@ -5,7 +5,7 @@ import (
 	"X_IM/pkg/logger"
 	"X_IM/pkg/wire/common"
 	"X_IM/pkg/wire/pkt"
-	x2 "X_IM/pkg/x"
+	"X_IM/pkg/x"
 	"bytes"
 	"errors"
 	"google.golang.org/protobuf/proto"
@@ -19,13 +19,13 @@ var log = logger.WithFields(logger.Fields{
 })
 
 type Handler struct {
-	r *x2.Router
+	r *x.Router
 	//Redis中的会话管理
-	cache      x2.SessionStorage
+	cache      x.SessionStorage
 	dispatcher *SvrDispatcher
 }
 
-func NewServHandler(r *x2.Router, cache x2.SessionStorage) *Handler {
+func NewServHandler(r *x.Router, cache x.SessionStorage) *Handler {
 	return &Handler{
 		r:          r,
 		dispatcher: &SvrDispatcher{},
@@ -33,7 +33,7 @@ func NewServHandler(r *x2.Router, cache x2.SessionStorage) *Handler {
 	}
 }
 
-func (h *Handler) Accept(conn x2.Conn, timeout time.Duration) (string, x2.Meta, error) {
+func (h *Handler) Accept(conn x.Conn, timeout time.Duration) (string, x.Meta, error) {
 	log.Infoln("accept")
 
 	_ = conn.SetReadDeadline(time.Now().Add(timeout))
@@ -49,7 +49,7 @@ func (h *Handler) Accept(conn x2.Conn, timeout time.Duration) (string, x2.Meta, 
 	return req.ServiceID, nil, nil
 }
 
-func (h *Handler) Receive(agent x2.Agent, payload []byte) {
+func (h *Handler) Receive(agent x.Agent, payload []byte) {
 	buf := bytes.NewBuffer(payload)
 	packet, err := pkt.MustReadLogicPkt(buf)
 	if err != nil {
@@ -72,7 +72,7 @@ func (h *Handler) Receive(agent x2.Agent, payload []byte) {
 
 		session, err = h.cache.Get(packet.ChannelID)
 		//session不存在，需要重新连接并登录
-		if errors.Is(err, x2.ErrSessionNil) {
+		if errors.Is(err, x.ErrSessionNil) {
 			_ = RespErr(agent, packet, pkt.Status_SessionNotFound)
 			return
 		} else if err != nil {
@@ -87,7 +87,7 @@ func (h *Handler) Receive(agent x2.Agent, payload []byte) {
 	}
 }
 
-func RespErr(agent x2.Agent, p *pkt.LogicPkt, status pkt.Status) error {
+func RespErr(agent x.Agent, p *pkt.LogicPkt, status pkt.Status) error {
 	packet := pkt.NewFrom(&p.Header)
 	packet.Status = status
 	packet.Flag = pkt.Flag_Response

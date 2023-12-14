@@ -4,7 +4,7 @@ import (
 	"X_IM/internal/logic/client"
 	"X_IM/pkg/wire/pkt"
 	"X_IM/pkg/wire/rpc"
-	x2 "X_IM/pkg/x"
+	"X_IM/pkg/x"
 	"errors"
 	"time"
 )
@@ -24,7 +24,7 @@ func NewChatHandler(msg client.Message, group client.Group) *ChatHandler {
 }
 
 // DoSingleTalk 单聊
-func (h *ChatHandler) DoSingleTalk(ctx x2.Context) {
+func (h *ChatHandler) DoSingleTalk(ctx x.Context) {
 	if ctx.Header().Dest == "" {
 		_ = ctx.RespWithError(pkt.Status_NoDestination, ErrNoDestination)
 		return
@@ -38,7 +38,7 @@ func (h *ChatHandler) DoSingleTalk(ctx x2.Context) {
 	// 2. 获取接收方的位置信息
 	receiver := ctx.Header().GetDest()
 	loc, err := ctx.GetLocation(receiver, "")
-	if err != nil && errors.Is(err, x2.ErrSessionNil) {
+	if err != nil && errors.Is(err, x.ErrSessionNil) {
 		_ = ctx.RespWithError(pkt.Status_SystemException, err)
 		return
 	}
@@ -82,7 +82,7 @@ func (h *ChatHandler) DoSingleTalk(ctx x2.Context) {
 }
 
 // DoGroupTalk 群聊
-func (h *ChatHandler) DoGroupTalk(ctx x2.Context) {
+func (h *ChatHandler) DoGroupTalk(ctx x.Context) {
 	if ctx.Header().GetDest() == "" {
 		_ = ctx.RespWithError(pkt.Status_NoDestination, ErrNoDestination)
 		return
@@ -126,7 +126,7 @@ func (h *ChatHandler) DoGroupTalk(ctx x2.Context) {
 	}
 	// 4. 批量寻址（群成员）
 	locs, err := ctx.GetLocations(members...)
-	if err != nil && !errors.Is(err, x2.ErrSessionNil) {
+	if err != nil && !errors.Is(err, x.ErrSessionNil) {
 		_ = ctx.RespWithError(pkt.Status_SystemException, err)
 		return
 	}
@@ -152,7 +152,7 @@ func (h *ChatHandler) DoGroupTalk(ctx x2.Context) {
 	})
 }
 
-func (h *ChatHandler) DoTalkAck(ctx x2.Context) {
+func (h *ChatHandler) DoTalkAck(ctx x.Context) {
 	var req pkt.MessageAckReq
 	if err := ctx.ReadBody(&req); err != nil {
 		_ = ctx.RespWithError(pkt.Status_InvalidPacketBody, err)

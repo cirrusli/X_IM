@@ -2,7 +2,7 @@ package storage
 
 import (
 	"X_IM/pkg/wire/pkt"
-	x2 "X_IM/pkg/x"
+	"X_IM/pkg/x"
 	"errors"
 	"github.com/gitstliu/go-redis-cluster"
 	"time"
@@ -14,7 +14,7 @@ type RedisClusterStorage struct {
 	cli *redis.Cluster
 }
 
-func NewRedisClusterStorage(cli *redis.Cluster) x2.SessionStorage {
+func NewRedisClusterStorage(cli *redis.Cluster) x.SessionStorage {
 	return &RedisClusterStorage{
 		cli: cli,
 	}
@@ -22,7 +22,7 @@ func NewRedisClusterStorage(cli *redis.Cluster) x2.SessionStorage {
 
 func (r *RedisClusterStorage) Add(session *pkt.Session) error {
 	// save x.Location
-	loc := x2.Location{
+	loc := x.Location{
 		ChannelID: session.ChannelID,
 		GateID:    session.GateID,
 	}
@@ -64,7 +64,7 @@ func (r *RedisClusterStorage) Get(ChannelId string) (*pkt.Session, error) {
 	bts, err := redis.Bytes(r.cli.Do("GET", snKey))
 	if err != nil {
 		if errors.Is(err, redis.ErrNil) {
-			return nil, x2.ErrSessionNil
+			return nil, x.ErrSessionNil
 		}
 		return nil, err
 	}
@@ -73,37 +73,37 @@ func (r *RedisClusterStorage) Get(ChannelId string) (*pkt.Session, error) {
 	return &session, nil
 }
 
-func (r *RedisClusterStorage) GetLocations(accounts ...string) ([]*x2.Location, error) {
+func (r *RedisClusterStorage) GetLocations(accounts ...string) ([]*x.Location, error) {
 	keys := KeyLocations(accounts...)
 	list, err := redis.Values(r.cli.Do("MGET", keys))
 	if err != nil {
 		return nil, err
 	}
-	var result = make([]*x2.Location, 0)
+	var result = make([]*x.Location, 0)
 	for _, l := range list {
 		if l == nil {
 			continue
 		}
-		var loc x2.Location
+		var loc x.Location
 		_ = loc.Unmarshal([]byte(l.(string)))
 		result = append(result, &loc)
 	}
 	if len(result) == 0 {
-		return nil, x2.ErrSessionNil
+		return nil, x.ErrSessionNil
 	}
 	return result, nil
 }
 
-func (r *RedisClusterStorage) GetLocation(account string, device string) (*x2.Location, error) {
+func (r *RedisClusterStorage) GetLocation(account string, device string) (*x.Location, error) {
 	key := KeyLocation(account, device)
 	bts, err := redis.Bytes(r.cli.Do("GET", key))
 	if err != nil {
 		if errors.Is(err, redis.ErrNil) {
-			return nil, x2.ErrSessionNil
+			return nil, x.ErrSessionNil
 		}
 		return nil, err
 	}
-	var loc x2.Location
+	var loc x.Location
 	_ = loc.Unmarshal(bts)
 	return &loc, nil
 }

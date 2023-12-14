@@ -2,7 +2,7 @@ package storage
 
 import (
 	"X_IM/pkg/wire/pkt"
-	x2 "X_IM/pkg/x"
+	"X_IM/pkg/x"
 	"fmt"
 	"github.com/go-redis/redis/v7"
 	"google.golang.org/protobuf/proto"
@@ -17,12 +17,12 @@ type RedisStorage struct {
 	cli *redis.Client
 }
 
-func NewRedisStorage(cli *redis.Client) x2.SessionStorage {
+func NewRedisStorage(cli *redis.Client) x.SessionStorage {
 	return &RedisStorage{cli: cli}
 }
 func (r *RedisStorage) Add(session *pkt.Session) error {
 	// save x.Location
-	loc := x2.Location{
+	loc := x.Location{
 		ChannelID: session.ChannelID,
 		GateID:    session.GateID,
 	}
@@ -63,7 +63,7 @@ func (r *RedisStorage) Get(ChannelID string) (*pkt.Session, error) {
 	bts, err := r.cli.Get(snKey).Bytes()
 	if err != nil {
 		if err == redis.Nil {
-			return nil, x2.ErrSessionNil
+			return nil, x.ErrSessionNil
 		}
 		return nil, err
 	}
@@ -72,37 +72,37 @@ func (r *RedisStorage) Get(ChannelID string) (*pkt.Session, error) {
 	return &session, nil
 }
 
-func (r *RedisStorage) GetLocations(accounts ...string) ([]*x2.Location, error) {
+func (r *RedisStorage) GetLocations(accounts ...string) ([]*x.Location, error) {
 	keys := KeyLocations(accounts...)
 	list, err := r.cli.MGet(keys...).Result()
 	if err != nil {
 		return nil, err
 	}
-	var result = make([]*x2.Location, 0)
+	var result = make([]*x.Location, 0)
 	for _, l := range list {
 		if l == nil {
 			continue
 		}
-		var loc x2.Location
+		var loc x.Location
 		_ = loc.Unmarshal([]byte(l.(string)))
 		result = append(result, &loc)
 	}
 	if len(result) == 0 {
-		return nil, x2.ErrSessionNil
+		return nil, x.ErrSessionNil
 	}
 	return result, nil
 }
 
-func (r *RedisStorage) GetLocation(account string, device string) (*x2.Location, error) {
+func (r *RedisStorage) GetLocation(account string, device string) (*x.Location, error) {
 	key := KeyLocation(account, device)
 	bts, err := r.cli.Get(key).Bytes()
 	if err != nil {
 		if err == redis.Nil {
-			return nil, x2.ErrSessionNil
+			return nil, x.ErrSessionNil
 		}
 		return nil, err
 	}
-	var loc x2.Location
+	var loc x.Location
 	_ = loc.Unmarshal(bts)
 	return &loc, nil
 }

@@ -4,7 +4,7 @@ import (
 	"X_IM/internal/logic/client"
 	"X_IM/pkg/wire/pkt"
 	"X_IM/pkg/wire/rpc"
-	x2 "X_IM/pkg/x"
+	"X_IM/pkg/x"
 	"errors"
 )
 
@@ -18,7 +18,7 @@ func NewGroupHandler(groupService client.Group) *GroupHandler {
 	}
 }
 
-func (h *GroupHandler) DoCreate(ctx x2.Context) {
+func (h *GroupHandler) DoCreate(ctx x.Context) {
 	var req pkt.GroupCreateReq
 	if err := ctx.ReadBody(&req); err != nil {
 		_ = ctx.RespWithError(pkt.Status_InvalidPacketBody, err)
@@ -37,7 +37,7 @@ func (h *GroupHandler) DoCreate(ctx x2.Context) {
 	}
 
 	locs, err := ctx.GetLocations(req.GetMembers()...)
-	if err != nil && !errors.Is(err, x2.ErrSessionNil) {
+	if err != nil && !errors.Is(err, x.ErrSessionNil) {
 		_ = ctx.RespWithError(pkt.Status_SystemException, err)
 		return
 	}
@@ -58,7 +58,7 @@ func (h *GroupHandler) DoCreate(ctx x2.Context) {
 	})
 }
 
-func (h *GroupHandler) DoJoin(ctx x2.Context) {
+func (h *GroupHandler) DoJoin(ctx x.Context) {
 	var req pkt.GroupJoinReq
 	if err := ctx.ReadBody(&req); err != nil {
 		_ = ctx.RespWithError(pkt.Status_InvalidPacketBody, err)
@@ -76,7 +76,7 @@ func (h *GroupHandler) DoJoin(ctx x2.Context) {
 	_ = ctx.Resp(pkt.Status_Success, nil)
 }
 
-func (h *GroupHandler) DoQuit(ctx x2.Context) {
+func (h *GroupHandler) DoQuit(ctx x.Context) {
 	var req pkt.GroupQuitReq
 	if err := ctx.ReadBody(&req); err != nil {
 		_ = ctx.RespWithError(pkt.Status_InvalidPacketBody, err)
@@ -94,7 +94,7 @@ func (h *GroupHandler) DoQuit(ctx x2.Context) {
 }
 
 // DoDetail 获取群基本信息及成员列表
-func (h *GroupHandler) DoDetail(ctx x2.Context) {
+func (h *GroupHandler) DoDetail(ctx x.Context) {
 	var req pkt.GroupGetReq
 	if err := ctx.ReadBody(&req); err != nil {
 		_ = ctx.RespWithError(pkt.Status_InvalidPacketBody, err)
