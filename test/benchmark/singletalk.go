@@ -1,11 +1,11 @@
 package benchmark
 
 import (
-	"X_IM/examples/benchmark/report"
-	"X_IM/examples/mock/dialer"
 	"X_IM/pkg/wire/common"
 	"X_IM/pkg/wire/pkt"
 	"X_IM/pkg/x"
+	"X_IM/test/benchmark/report"
+	"X_IM/test/mock/dialer"
 	"fmt"
 	"github.com/panjf2000/ants/v2"
 	"os"

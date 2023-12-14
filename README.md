@@ -35,7 +35,7 @@ go run main.go [gateway/router/logic/occult]
 ├─cmd
 │  └─data
 ├─docs
-├─examples
+├─test
 │  ├─benchmark
 │  ├─fuzz
 │  ├─mock

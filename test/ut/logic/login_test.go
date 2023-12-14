@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"X_IM/examples/mock/dialer"
+	"X_IM/test/mock/dialer"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"

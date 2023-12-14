@@ -36,7 +36,7 @@ func BenchmarkTimingWheelTimer(b *testing.B) {
 //
 //goos: windows
 //goarch: amd64
-//pkg: X_IM/examples/benchmark/timer
+//pkg: X_IM/test/benchmark/timer
 //cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
 //BenchmarkTimeTimer
 //BenchmarkTimeTimer-8             4938370               230.9 ns/op           200

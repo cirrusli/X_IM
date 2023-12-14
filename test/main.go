@@ -1,10 +1,10 @@
 package main
 
 import (
-	"X_IM/examples/benchmark"
-	"X_IM/examples/mock"
-	"X_IM/examples/ut"
 	"X_IM/pkg/logger"
+	"X_IM/test/benchmark"
+	"X_IM/test/mock"
+	"X_IM/test/ut"
 	"context"
 	"flag"
 	"github.com/spf13/cobra"

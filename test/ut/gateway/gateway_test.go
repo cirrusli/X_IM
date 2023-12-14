@@ -1,13 +1,13 @@
 package gateway
 
 import (
-	mymock "X_IM/examples/mock"
 	"X_IM/internal/gateway/serv"
 	"X_IM/pkg/logger"
 	"X_IM/pkg/token"
 	"X_IM/pkg/wire/common"
 	"X_IM/pkg/wire/pkt"
 	"X_IM/pkg/x"
+	mymock "X_IM/test/mock"
 	"bytes"
 	"fmt"
 	"github.com/stretchr/testify/assert"
